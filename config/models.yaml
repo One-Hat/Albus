@@ -1,0 +1,36 @@
+# Nemotron Models Configuration for Nebius Token Factory
+# Rule 3: Never invent model IDs. Read them from config/models.yaml.
+
+models:
+  nano:
+    id: "nvidia/nemotron-3-nano-30b-a3b"
+    role: "bulk extraction and swarm personas"
+    context_window: 32768
+    max_output_tokens: 4096
+    temperature: 0.1
+    cost_per_1m_input_tokens_usd: 0.20
+    cost_per_1m_output_tokens_usd: 0.40
+
+  super:
+    id: "nvidia/nemotron-3-super-120b-a12b"
+    role: "research agent, swarm reasoner, aggregator"
+    context_window: 262144
+    max_output_tokens: 8192
+    temperature: 0.2
+    cost_per_1m_input_tokens_usd: 0.80
+    cost_per_1m_output_tokens_usd: 1.60
+
+  ultra:
+    id: "nvidia/Nemotron-3-Ultra-550b-a55b"
+    role: "critic and final adjudicator"
+    context_window: 1048576
+    max_output_tokens: 16384
+    temperature: 0.2
+    cost_per_1m_input_tokens_usd: 3.00
+    cost_per_1m_output_tokens_usd: 6.00
+
+endpoints:
+  base_url: "https://api.tokenfactory.nebius.com/v1"
+  timeout_seconds: 60
+  max_retries: 3
+  concurrency_limit: 10

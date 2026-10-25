@@ -32,6 +32,7 @@ minversion = "7.0"
 testpaths = ["tests"]
 pythonpath = ["src"]
 asyncio_mode = "auto"
+addopts = "-p no:cacheprovider"
 filterwarnings = [
     "ignore::DeprecationWarning"
 ]
