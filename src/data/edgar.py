@@ -4,6 +4,7 @@ Adheres strictly to SEC Fair-Access rules (<= 10 requests/sec, declared User-Age
 """
 from __future__ import annotations
 import asyncio
+import json
 import os
 import re
 import time
@@ -31,8 +32,12 @@ class EDGARClient:
         cache_dir: str | Path = "data/raw/edgar",
         requests_per_second: float = 8.0,
     ):
-        # SEC Fair Access requires user-agent in format: Name AdminContact@domain.com
-        raw_ua = user_agent or os.environ.get("EDGAR_USER_AGENT", "ALBUS-QuantResearchCopilot/1.0 (researcher@example.com)")
+        raw_ua = (
+            user_agent
+            or os.environ.get("SEC_USER_AGENT")
+            or os.environ.get("EDGAR_USER_AGENT")
+            or "ALBUS-QuantResearchCopilot/1.0 (researcher@example.com)"
+        )
         self.user_agent = raw_ua
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
@@ -60,7 +65,6 @@ class EDGARClient:
         return {
             "User-Agent": self.user_agent,
             "Accept-Encoding": "gzip, deflate",
-            "Host": "data.sec.gov",
         }
 
     def parse_acceptance_datetime(self, sec_timestamp_str: str) -> datetime:
@@ -98,3 +102,69 @@ class EDGARClient:
         """Save filing to local disk cache."""
         cache_file = self.cache_dir / f"{ticker}_{accession_number}.txt"
         cache_file.write_text(content, encoding="utf-8")
+
+    def fetch_ticker_to_cik_map(self) -> Dict[str, str]:
+        """Fetch mapping of uppercase ticker to 10-digit zero-padded CIK string."""
+        cache_file = self.cache_dir / "company_tickers.json"
+        if cache_file.exists():
+            try:
+                data = json.loads(cache_file.read_text(encoding="utf-8"))
+                return {v["ticker"].upper(): str(v["cik_str"]).zfill(10) for v in data.values()}
+            except Exception:
+                pass
+
+        self._enforce_rate_limit()
+        url = "https://www.sec.gov/files/company_tickers.json"
+        with httpx.Client(timeout=30.0, headers=self.get_headers(), follow_redirects=True) as client:
+            resp = client.get(url)
+            if resp.status_code != 200:
+                raise RuntimeError(f"Failed to fetch SEC ticker map: HTTP {resp.status_code}")
+            cache_file.write_text(resp.text, encoding="utf-8")
+            data = resp.json()
+            return {v["ticker"].upper(): str(v["cik_str"]).zfill(10) for v in data.values()}
+
+    def fetch_company_submissions(self, cik: str) -> Dict[str, Any]:
+        """Fetch recent submissions JSON for a company."""
+        clean_cik = cik.zfill(10)
+        cache_file = self.cache_dir / f"CIK{clean_cik}_submissions.json"
+        if cache_file.exists():
+            try:
+                return json.loads(cache_file.read_text(encoding="utf-8"))
+            except Exception:
+                pass
+
+        self._enforce_rate_limit()
+        url = self.SUBMISSIONS_URL.format(cik=clean_cik)
+        with httpx.Client(timeout=30.0, headers=self.get_headers(), follow_redirects=True) as client:
+            resp = client.get(url)
+            if resp.status_code != 200:
+                raise RuntimeError(f"Failed to fetch submissions for CIK {clean_cik}: HTTP {resp.status_code}")
+            cache_file.write_text(resp.text, encoding="utf-8")
+            return resp.json()
+
+    def fetch_filing_document(
+        self,
+        ticker: str,
+        cik: str,
+        accession_number: str,
+        primary_doc: str,
+    ) -> str:
+        """Fetch primary document text or HTML, using local cache if available."""
+        cached = self.fetch_filing_text_cached(ticker, accession_number)
+        if cached:
+            return cached
+
+        clean_cik = str(int(cik))  # SEC archives URL uses unpadded CIK
+        nodash_acc = accession_number.replace("-", "")
+        url = f"https://www.sec.gov/Archives/edgar/data/{clean_cik}/{nodash_acc}/{primary_doc}"
+
+        self._enforce_rate_limit()
+        with httpx.Client(timeout=60.0, headers=self.get_headers(), follow_redirects=True) as client:
+            resp = client.get(url)
+            if resp.status_code != 200:
+                raise RuntimeError(
+                    f"Failed to fetch filing document for {ticker} ({accession_number}): HTTP {resp.status_code}"
+                )
+            content = resp.text
+            self.save_filing_text_cached(ticker, accession_number, content)
+            return content
