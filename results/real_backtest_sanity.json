@@ -1,0 +1,533 @@
+{
+  "timestamp_utc": "2026-10-25T18:50:30.769559+00:00",
+  "strategy": "yoy_item_1a_character_length_change",
+  "description": "Non-LLM plumbing test: YoY change in Item 1A length executed next-open with 10bps costs",
+  "config": {
+    "horizon_days": 60,
+    "cost_bps": 10.0,
+    "n_quantiles": 10,
+    "periods_per_year": 4.0,
+    "bootstrap_samples": 1000
+  },
+  "metrics": {
+    "sharpe": -0.1432557758676731,
+    "sharpe_ci_95": [
+      -0.8562082268735749,
+      0.5367290387691682
+    ],
+    "max_drawdown": 0.8218138760298725,
+    "turnover": 1.0,
+    "mean_period_return": -0.01261737648799705,
+    "total_return": -0.6363795155075735,
+    "total_cost_drag": 0.07000000000000005,
+    "sample_size": 35
+  },
+  "counts": {
+    "total_filings_evaluated": 54,
+    "filings_used": 35,
+    "filings_dropped": 19
+  },
+  "filings_used": [
+    {
+      "ticker": "AAPL",
+      "accession_number": "0000320193-24-000123",
+      "accepted_at": "2024-11-01T10:01:36+00:00",
+      "prev_length": 67850,
+      "curr_length": 68735,
+      "yoy_change": 0.013043478260869565,
+      "execution_time": "2024-11-01T00:00:00-04:00",
+      "execution_open": 219.1368672842602,
+      "forward_60d_return": 0.0691934259151721
+    },
+    {
+      "ticker": "AAPL",
+      "accession_number": "0000320193-25-000079",
+      "accepted_at": "2025-10-31T10:01:26+00:00",
+      "prev_length": 68735,
+      "curr_length": 68020,
+      "yoy_change": -0.01040226958609151,
+      "execution_time": "2025-10-31T00:00:00-04:00",
+      "execution_open": 275.97053891965146,
+      "forward_60d_return": -0.06664353032826104
+    },
+    {
+      "ticker": "MSFT",
+      "accession_number": "0000950170-25-100235",
+      "accepted_at": "2025-07-30T20:11:40+00:00",
+      "prev_length": 73674,
+      "curr_length": 68905,
+      "yoy_change": -0.06473111273990824,
+      "execution_time": "2025-07-31T00:00:00-04:00",
+      "execution_open": 549.795171976257,
+      "forward_60d_return": -0.05539917123884119
+    },
+    {
+      "ticker": "MSFT",
+      "accession_number": "0001193125-26-323660",
+      "accepted_at": "2026-07-29T20:08:01+00:00",
+      "prev_length": 68905,
+      "curr_length": 81137,
+      "yoy_change": 0.17751977360133517,
+      "execution_time": "2026-07-30T00:00:00-04:00",
+      "execution_open": 437.07720086969465,
+      "forward_60d_return": 0.20003973833903224
+    },
+    {
+      "ticker": "NVDA",
+      "accession_number": "0001045810-25-000023",
+      "accepted_at": "2025-02-26T21:48:33+00:00",
+      "prev_length": 122825,
+      "curr_length": 126020,
+      "yoy_change": 0.026012619580704253,
+      "execution_time": "2025-02-27T00:00:00-05:00",
+      "execution_open": 134.64800202891726,
+      "forward_60d_return": -0.02739205317914898
+    },
+    {
+      "ticker": "NVDA",
+      "accession_number": "0001045810-26-000021",
+      "accepted_at": "2026-02-25T21:42:19+00:00",
+      "prev_length": 126020,
+      "curr_length": 122331,
+      "yoy_change": -0.029273131249008093,
+      "execution_time": "2026-02-26T00:00:00-05:00",
+      "execution_open": 193.81648130196652,
+      "forward_60d_return": 0.10846573407726204
+    },
+    {
+      "ticker": "AMZN",
+      "accession_number": "0001018724-25-000004",
+      "accepted_at": "2025-02-06T23:40:29+00:00",
+      "prev_length": 71808,
+      "curr_length": 72221,
+      "yoy_change": 0.0057514483065953656,
+      "execution_time": "2025-02-07T00:00:00-05:00",
+      "execution_open": 232.5,
+      "forward_60d_return": -0.20425808814264113
+    },
+    {
+      "ticker": "AMZN",
+      "accession_number": "0001018724-26-000004",
+      "accepted_at": "2026-02-05T23:44:31+00:00",
+      "prev_length": 72221,
+      "curr_length": 73820,
+      "yoy_change": 0.02214037468326387,
+      "execution_time": "2026-02-06T00:00:00-05:00",
+      "execution_open": 202.6999969482422,
+      "forward_60d_return": 0.3495312871801253
+    },
+    {
+      "ticker": "GOOGL",
+      "accession_number": "0001652044-25-000014",
+      "accepted_at": "2025-02-05T01:41:40+00:00",
+      "prev_length": 110230,
+      "curr_length": 115732,
+      "yoy_change": 0.04991381656536333,
+      "execution_time": "2025-02-05T00:00:00-05:00",
+      "execution_open": 189.9550998506434,
+      "forward_60d_return": -0.14053023044960533
+    },
+    {
+      "ticker": "GOOGL",
+      "accession_number": "0001652044-26-000018",
+      "accepted_at": "2026-02-05T02:56:03+00:00",
+      "prev_length": 115732,
+      "curr_length": 110472,
+      "yoy_change": -0.04544983237134068,
+      "execution_time": "2026-02-05T00:00:00-05:00",
+      "execution_open": 311.6138496060838,
+      "forward_60d_return": 0.22836381465658703
+    },
+    {
+      "ticker": "META",
+      "accession_number": "0001628280-26-003942",
+      "accepted_at": "2026-01-29T00:13:46+00:00",
+      "prev_length": 239710,
+      "curr_length": 231411,
+      "yoy_change": -0.034621000375453674,
+      "execution_time": "2026-01-29T00:00:00-05:00",
+      "execution_open": 735.536439340887,
+      "forward_60d_return": -0.07896205547353734
+    },
+    {
+      "ticker": "TSLA",
+      "accession_number": "0001628280-25-003063",
+      "accepted_at": "2025-01-30T01:42:33+00:00",
+      "prev_length": 125287,
+      "curr_length": 129764,
+      "yoy_change": 0.035733954839688074,
+      "execution_time": "2025-01-30T00:00:00-05:00",
+      "execution_open": 410.7799987792969,
+      "forward_60d_return": -0.30405568495945784
+    },
+    {
+      "ticker": "TSLA",
+      "accession_number": "0001628280-26-003952",
+      "accepted_at": "2026-01-29T01:55:03+00:00",
+      "prev_length": 129764,
+      "curr_length": 129615,
+      "yoy_change": -0.0011482383403717518,
+      "execution_time": "2026-01-29T00:00:00-05:00",
+      "execution_open": 437.79998779296875,
+      "forward_60d_return": -0.1350616172086244
+    },
+    {
+      "ticker": "JNJ",
+      "accession_number": "0000200406-25-000038",
+      "accepted_at": "2025-02-13T21:07:39+00:00",
+      "prev_length": 42184,
+      "curr_length": 41228,
+      "yoy_change": -0.02266262089891902,
+      "execution_time": "2025-02-14T00:00:00-05:00",
+      "execution_open": 150.2023229262142,
+      "forward_60d_return": -0.04871119713602043
+    },
+    {
+      "ticker": "JNJ",
+      "accession_number": "0000200406-26-000016",
+      "accepted_at": "2026-02-11T21:06:11+00:00",
+      "prev_length": 41228,
+      "curr_length": 43307,
+      "yoy_change": 0.05042689434364995,
+      "execution_time": "2026-02-12T00:00:00-05:00",
+      "execution_open": 236.67325295914287,
+      "forward_60d_return": -0.07432162169122757
+    },
+    {
+      "ticker": "V",
+      "accession_number": "0001403161-24-000058",
+      "accepted_at": "2024-11-13T22:14:01+00:00",
+      "prev_length": 75012,
+      "curr_length": 80140,
+      "yoy_change": 0.06836239535007732,
+      "execution_time": "2024-11-14T00:00:00-05:00",
+      "execution_open": 305.2854440013447,
+      "forward_60d_return": 0.15172453596109323
+    },
+    {
+      "ticker": "V",
+      "accession_number": "0001403161-25-000089",
+      "accepted_at": "2025-11-06T21:09:41+00:00",
+      "prev_length": 80140,
+      "curr_length": 82176,
+      "yoy_change": 0.02540554030446718,
+      "execution_time": "2025-11-07T00:00:00-05:00",
+      "execution_open": 334.05836197719896,
+      "forward_60d_return": -0.02063398941120334
+    },
+    {
+      "ticker": "WMT",
+      "accession_number": "0000104169-25-000021",
+      "accepted_at": "2025-03-14T20:40:52+00:00",
+      "prev_length": 103006,
+      "curr_length": 112460,
+      "yoy_change": 0.09178106129740016,
+      "execution_time": "2025-03-17T00:00:00-04:00",
+      "execution_open": 83.78926680089555,
+      "forward_60d_return": 0.13115655136821022
+    },
+    {
+      "ticker": "WMT",
+      "accession_number": "0000104169-26-000055",
+      "accepted_at": "2026-03-13T20:06:24+00:00",
+      "prev_length": 112460,
+      "curr_length": 107110,
+      "yoy_change": -0.0475724702116308,
+      "execution_time": "2026-03-16T00:00:00-04:00",
+      "execution_open": 125.95788848185292,
+      "forward_60d_return": -0.04490305630152978
+    },
+    {
+      "ticker": "CALM",
+      "accession_number": "0001562762-25-000170",
+      "accepted_at": "2025-07-22T20:22:06+00:00",
+      "prev_length": 83211,
+      "curr_length": 92524,
+      "yoy_change": 0.11192029899893043,
+      "execution_time": "2025-07-23T00:00:00-04:00",
+      "execution_open": 107.55450093347336,
+      "forward_60d_return": -0.17026730800506015
+    },
+    {
+      "ticker": "CALM",
+      "accession_number": "0001562762-26-000080",
+      "accepted_at": "2026-07-22T10:17:26+00:00",
+      "prev_length": 92524,
+      "curr_length": 104823,
+      "yoy_change": 0.13292767282002507,
+      "execution_time": "2026-07-22T00:00:00-04:00",
+      "execution_open": 81.37999725341797,
+      "forward_60d_return": -0.21860405137925826
+    },
+    {
+      "ticker": "BOOT",
+      "accession_number": "0001558370-25-007889",
+      "accepted_at": "2025-05-15T20:22:43+00:00",
+      "prev_length": 111142,
+      "curr_length": 148025,
+      "yoy_change": 0.33185474438106205,
+      "execution_time": "2025-05-16T00:00:00-04:00",
+      "execution_open": 155.27000427246094,
+      "forward_60d_return": 0.08520638477167587
+    },
+    {
+      "ticker": "BOOT",
+      "accession_number": "0001104659-26-061346",
+      "accepted_at": "2026-05-14T21:25:53+00:00",
+      "prev_length": 148025,
+      "curr_length": 157654,
+      "yoy_change": 0.06504982266509035,
+      "execution_time": "2026-05-15T00:00:00-04:00",
+      "execution_open": 156.9499969482422,
+      "forward_60d_return": 0.024147872689489227
+    },
+    {
+      "ticker": "SHOO",
+      "accession_number": "0001628280-25-009503",
+      "accepted_at": "2025-03-03T22:08:11+00:00",
+      "prev_length": 78802,
+      "curr_length": 81914,
+      "yoy_change": 0.03949138346742469,
+      "execution_time": "2025-03-04T00:00:00-05:00",
+      "execution_open": 28.762026515729822,
+      "forward_60d_return": -0.14899218410571574
+    },
+    {
+      "ticker": "SHOO",
+      "accession_number": "0001628280-26-012995",
+      "accepted_at": "2026-03-02T12:13:18+00:00",
+      "prev_length": 81914,
+      "curr_length": 87697,
+      "yoy_change": 0.07059843250238054,
+      "execution_time": "2026-03-02T00:00:00-05:00",
+      "execution_open": 34.21026021388112,
+      "forward_60d_return": 0.258510349031115
+    },
+    {
+      "ticker": "KFY",
+      "accession_number": "0001628280-25-033260",
+      "accepted_at": "2025-06-27T18:15:56+00:00",
+      "prev_length": 86570,
+      "curr_length": 86109,
+      "yoy_change": -0.005325170382349544,
+      "execution_time": "2025-06-30T00:00:00-04:00",
+      "execution_open": 70.16608729252465,
+      "forward_60d_return": -0.015765619075089204
+    },
+    {
+      "ticker": "KFY",
+      "accession_number": "0000056679-26-000021",
+      "accepted_at": "2026-06-26T20:32:06+00:00",
+      "prev_length": 86109,
+      "curr_length": 83198,
+      "yoy_change": -0.033805990082337506,
+      "execution_time": "2026-06-29T00:00:00-04:00",
+      "execution_open": 71.6882354520907,
+      "forward_60d_return": 0.031689490166070325
+    },
+    {
+      "ticker": "MED",
+      "accession_number": "0001628280-25-006094",
+      "accepted_at": "2025-02-18T21:50:45+00:00",
+      "prev_length": 576,
+      "curr_length": 576,
+      "yoy_change": 0.0,
+      "execution_time": "2025-02-19T00:00:00-05:00",
+      "execution_open": 15.800000190734863,
+      "forward_60d_return": -0.15379748581273664
+    },
+    {
+      "ticker": "MED",
+      "accession_number": "0001628280-26-008656",
+      "accepted_at": "2026-02-17T21:54:04+00:00",
+      "prev_length": 576,
+      "curr_length": 576,
+      "yoy_change": 0.0,
+      "execution_time": "2026-02-18T00:00:00-05:00",
+      "execution_open": 10.5,
+      "forward_60d_return": 0.1990476335797991
+    },
+    {
+      "ticker": "PLCE",
+      "accession_number": "0001628280-25-018195",
+      "accepted_at": "2025-04-17T20:01:17+00:00",
+      "prev_length": 78310,
+      "curr_length": 82429,
+      "yoy_change": 0.05259864640531222,
+      "execution_time": "2025-04-21T00:00:00-04:00",
+      "execution_open": 5.710000038146973,
+      "forward_60d_return": -0.07355517924484026
+    },
+    {
+      "ticker": "PLCE",
+      "accession_number": "0001628280-26-024672",
+      "accepted_at": "2026-04-10T20:00:58+00:00",
+      "prev_length": 82429,
+      "curr_length": 84891,
+      "yoy_change": 0.02986812893520484,
+      "execution_time": "2026-04-13T00:00:00-04:00",
+      "execution_open": 3.0,
+      "forward_60d_return": 0.009999990463256836
+    },
+    {
+      "ticker": "TITN",
+      "accession_number": "0001409171-25-000027",
+      "accepted_at": "2025-04-07T20:52:18+00:00",
+      "prev_length": 48114,
+      "curr_length": 44733,
+      "yoy_change": -0.07027060730764434,
+      "execution_time": "2025-04-08T00:00:00-04:00",
+      "execution_open": 15.029999732971191,
+      "forward_60d_return": 0.4118429601036085
+    },
+    {
+      "ticker": "TITN",
+      "accession_number": "0001628280-26-022376",
+      "accepted_at": "2026-03-31T20:07:15+00:00",
+      "prev_length": 44733,
+      "curr_length": 44345,
+      "yoy_change": -0.008673686093040932,
+      "execution_time": "2026-04-01T00:00:00-04:00",
+      "execution_open": 16.790000915527344,
+      "forward_60d_return": 0.2471708988825823
+    },
+    {
+      "ticker": "PATK",
+      "accession_number": "0000076605-25-000062",
+      "accepted_at": "2025-02-20T21:11:24+00:00",
+      "prev_length": 98427,
+      "curr_length": 104905,
+      "yoy_change": 0.06581527426417548,
+      "execution_time": "2025-02-21T00:00:00-05:00",
+      "execution_open": 91.51011650738702,
+      "forward_60d_return": -0.06639015390525026
+    },
+    {
+      "ticker": "PATK",
+      "accession_number": "0000076605-26-000013",
+      "accepted_at": "2026-02-19T21:06:35+00:00",
+      "prev_length": 104905,
+      "curr_length": 103837,
+      "yoy_change": -0.010180639626328583,
+      "execution_time": "2026-02-20T00:00:00-05:00",
+      "execution_open": 134.29888895673696,
+      "forward_60d_return": -0.3347187350314864
+    }
+  ],
+  "filings_dropped": [
+    {
+      "ticker": "AAPL",
+      "accession_number": "0000320193-23-000106",
+      "accepted_at": "2023-11-02T22:08:27+00:00",
+      "reason": "earliest_filing_no_prior_fiscal_year_baseline"
+    },
+    {
+      "ticker": "MSFT",
+      "accession_number": "0000950170-24-087843",
+      "accepted_at": "2024-07-30T20:06:22+00:00",
+      "reason": "earliest_filing_no_prior_fiscal_year_baseline"
+    },
+    {
+      "ticker": "NVDA",
+      "accession_number": "0001045810-24-000029",
+      "accepted_at": "2024-02-21T21:36:57+00:00",
+      "reason": "earliest_filing_no_prior_fiscal_year_baseline"
+    },
+    {
+      "ticker": "AMZN",
+      "accession_number": "0001018724-24-000008",
+      "accepted_at": "2024-02-01T23:48:30+00:00",
+      "reason": "earliest_filing_no_prior_fiscal_year_baseline"
+    },
+    {
+      "ticker": "GOOGL",
+      "accession_number": "0001652044-24-000022",
+      "accepted_at": "2024-01-31T02:43:43+00:00",
+      "reason": "earliest_filing_no_prior_fiscal_year_baseline"
+    },
+    {
+      "ticker": "META",
+      "accession_number": "0001326801-25-000017",
+      "accepted_at": "2025-01-30T01:00:50+00:00",
+      "reason": "earliest_filing_no_prior_fiscal_year_baseline"
+    },
+    {
+      "ticker": "TSLA",
+      "accession_number": "0001628280-24-002390",
+      "accepted_at": "2024-01-27T02:00:20+00:00",
+      "reason": "earliest_filing_no_prior_fiscal_year_baseline"
+    },
+    {
+      "ticker": "JPM",
+      "accession_number": "0001628280-26-008131",
+      "accepted_at": "2026-02-13T21:20:00+00:00",
+      "reason": "earliest_filing_no_prior_fiscal_year_baseline"
+    },
+    {
+      "ticker": "JNJ",
+      "accession_number": "0000200406-24-000013",
+      "accepted_at": "2024-02-16T21:12:22+00:00",
+      "reason": "earliest_filing_no_prior_fiscal_year_baseline"
+    },
+    {
+      "ticker": "V",
+      "accession_number": "0001403161-23-000099",
+      "accepted_at": "2023-11-15T21:07:14+00:00",
+      "reason": "earliest_filing_no_prior_fiscal_year_baseline"
+    },
+    {
+      "ticker": "WMT",
+      "accession_number": "0000104169-24-000056",
+      "accepted_at": "2024-03-15T20:54:48+00:00",
+      "reason": "earliest_filing_no_prior_fiscal_year_baseline"
+    },
+    {
+      "ticker": "CALM",
+      "accession_number": "0001562762-24-000177",
+      "accepted_at": "2024-07-23T20:11:17+00:00",
+      "reason": "earliest_filing_no_prior_fiscal_year_baseline"
+    },
+    {
+      "ticker": "BOOT",
+      "accession_number": "0001558370-24-008176",
+      "accepted_at": "2024-05-14T22:41:48+00:00",
+      "reason": "earliest_filing_no_prior_fiscal_year_baseline"
+    },
+    {
+      "ticker": "SHOO",
+      "accession_number": "0001628280-24-008331",
+      "accepted_at": "2024-03-04T11:06:15+00:00",
+      "reason": "earliest_filing_no_prior_fiscal_year_baseline"
+    },
+    {
+      "ticker": "KFY",
+      "accession_number": "0001628280-24-030470",
+      "accepted_at": "2024-06-28T19:09:13+00:00",
+      "reason": "earliest_filing_no_prior_fiscal_year_baseline"
+    },
+    {
+      "ticker": "MED",
+      "accession_number": "0001628280-24-005620",
+      "accepted_at": "2024-02-20T21:50:57+00:00",
+      "reason": "earliest_filing_no_prior_fiscal_year_baseline"
+    },
+    {
+      "ticker": "PLCE",
+      "accession_number": "0001628280-24-020436",
+      "accepted_at": "2024-05-04T01:53:30+00:00",
+      "reason": "earliest_filing_no_prior_fiscal_year_baseline"
+    },
+    {
+      "ticker": "TITN",
+      "accession_number": "0001409171-24-000028",
+      "accepted_at": "2024-04-03T20:24:38+00:00",
+      "reason": "earliest_filing_no_prior_fiscal_year_baseline"
+    },
+    {
+      "ticker": "PATK",
+      "accession_number": "0000076605-24-000078",
+      "accepted_at": "2024-02-29T13:01:11+00:00",
+      "reason": "earliest_filing_no_prior_fiscal_year_baseline"
+    }
+  ]
+}
