@@ -251,3 +251,182 @@ def test_rule_4_mock_llm_never_imported_in_src():
             f"Rule 4 Violation: {py_file} imports or references MockLLM! "
             f"MockLLM is strictly prohibited inside src/."
         )
+
+
+# ==============================================================================
+# W3 Live-Readiness Synthetic Unit Tests (Reasoning Models, Truncation, 429)
+# All fixtures below are hand-written synthetic responses, commented as synthetic.
+# ==============================================================================
+
+
+@pytest.mark.asyncio
+async def test_synthetic_reasoning_shape_answer_in_content(temp_cache_dir):
+    """
+    Synthetic Test: Response shape where thought is in reasoning_content
+    and the final answer is cleanly delivered in content.
+    """
+    # SYNTHETIC FIXTURE: Hand-written synthetic response shape (answer in content)
+    synthetic_fixture = {
+        "content": '{"category": "macro", "quote": "inflationary pressures", "risk_score": 0.65}',
+        "reasoning_content": "Chain-of-thought: Analyzed item 1A macro factors regarding rising interest rates.",
+        "prompt_tokens": 120,
+        "completion_tokens": 45,
+    }
+
+    mock = MockLLM()
+    mock.register_response(
+        role_or_model="nano",
+        content=synthetic_fixture["content"],
+        reasoning=synthetic_fixture["reasoning_content"],
+        prompt_tokens=synthetic_fixture["prompt_tokens"],
+        completion_tokens=synthetic_fixture["completion_tokens"],
+    )
+
+    cache = DiskCache(cache_dir=temp_cache_dir)
+    client = LLMClient(cache=cache, mock_provider=mock)
+
+    resp = await client.generate(
+        role="nano",
+        messages=[{"role": "user", "content": "Extract macro risk claim"}],
+        use_cache=False,
+    )
+    assert resp.content == synthetic_fixture["content"]
+    assert resp.reasoning == synthetic_fixture["reasoning_content"]
+
+
+@pytest.mark.asyncio
+async def test_synthetic_reasoning_shape_answer_only_in_reasoning_content(temp_cache_dir):
+    """
+    Synthetic Test: Reasoning model outputs the entire answer inside reasoning_content
+    (or reasoning field), leaving content empty or None.
+    """
+    # SYNTHETIC FIXTURE: Hand-written synthetic response shape (content empty, answer in reasoning_content)
+    synthetic_fixture = {
+        "content": "",
+        "reasoning_content": (
+            "Thinking process: Evaluating regulatory disclosures.\n"
+            "```json\n"
+            '{"category": "regulatory", "quote": "subject to strict oversight", "risk_score": 0.80}\n'
+            "```"
+        ),
+        "prompt_tokens": 140,
+        "completion_tokens": 60,
+    }
+
+    mock = MockLLM()
+    mock.register_sequence(
+        role_or_model="nano",
+        responses=[synthetic_fixture],
+    )
+
+    cache = DiskCache(cache_dir=temp_cache_dir)
+    client = LLMClient(cache=cache, mock_provider=mock)
+
+    claim: SampleClaim = await client.generate_structured(
+        role="nano",
+        messages=[{"role": "user", "content": "Extract regulatory claim"}],
+        response_model=SampleClaim,
+        use_cache=False,
+    )
+    assert isinstance(claim, SampleClaim)
+    assert claim.category == "regulatory"
+    assert claim.quote == "subject to strict oversight"
+    assert claim.risk_score == 0.80
+
+
+@pytest.mark.asyncio
+async def test_synthetic_reasoning_shape_empty_content_finish_reason_length(temp_cache_dir):
+    """
+    Synthetic Test: Response with empty content and finish_reason='length'
+    must fail loudly with a clear error indicating token truncation.
+    """
+    # SYNTHETIC FIXTURE: Hand-written synthetic response shape (empty content, finish_reason=length)
+    synthetic_fixture = {
+        "content": "",
+        "reasoning": "Extensive reasoning about supply chain bottlenecks that used up all output tokens...",
+        "finish_reason": "length",
+        "prompt_tokens": 4096,
+        "completion_tokens": 4096,
+    }
+
+    mock = MockLLM()
+    mock.register_sequence(
+        role_or_model="nano",
+        responses=[synthetic_fixture],
+    )
+
+    cache = DiskCache(cache_dir=temp_cache_dir)
+    client = LLMClient(cache=cache, mock_provider=mock)
+
+    with pytest.raises(RuntimeError) as exc_info:
+        await client.generate(
+            role="nano",
+            messages=[{"role": "user", "content": "Large prompt triggering token limit"}],
+            use_cache=False,
+        )
+
+    assert "finish_reason='length'" in str(exc_info.value)
+    assert "truncated" in str(exc_info.value).lower()
+
+
+@pytest.mark.asyncio
+async def test_synthetic_truncated_json_repair(temp_cache_dir):
+    """
+    Synthetic Test: Output JSON truncated mid-stream by token limit is recovered
+    by heuristic bracket/quote repair in generate_structured.
+    """
+    # SYNTHETIC FIXTURE: Hand-written synthetic truncated JSON fixture
+    # Missing closing quote, closing brace, and field
+    truncated_synthetic_raw = (
+        '{"category": "cybersecurity", "quote": "We faced unauthorized network access", "risk_score": 0.9'
+        # Intentionally missing closing '}'
+    )
+
+    mock = MockLLM()
+    mock.register_sequence(
+        role_or_model="nano",
+        responses=[{"content": truncated_synthetic_raw}],
+    )
+
+    cache = DiskCache(cache_dir=temp_cache_dir)
+    client = LLMClient(cache=cache, mock_provider=mock)
+
+    claim: SampleClaim = await client.generate_structured(
+        role="nano",
+        messages=[{"role": "user", "content": "Extract cyber risk claim"}],
+        response_model=SampleClaim,
+        max_repairs=0,  # Must be fixed on initial attempt via heuristic bracket repair
+        use_cache=False,
+    )
+    assert isinstance(claim, SampleClaim)
+    assert claim.category == "cybersecurity"
+    assert claim.quote == "We faced unauthorized network access"
+    assert claim.risk_score == 0.9
+
+
+@pytest.mark.asyncio
+async def test_synthetic_429_with_retry_after(temp_cache_dir):
+    """
+    Synthetic Test: Upstream HTTP 429 response with Retry-After header is honored
+    with appropriate backoff delay and succeeds on subsequent attempt.
+    """
+    # SYNTHETIC FIXTURE: Hand-written synthetic 429 error with Retry-After header
+    mock = MockLLM()
+    mock.failing_sequences["nano"] = {
+        "fail_count": 1,
+        "error_message": "Rate limit exceeded (HTTP 429)",
+        "headers": {"Retry-After": "0.05"},  # 50ms synthetic delay
+        "success_content": '{"category": "liquidity", "quote": "Credit facility covenants", "risk_score": 0.4}',
+        "success_reasoning": "Recovered reasoning after rate limit delay.",
+    }
+
+    cache = DiskCache(cache_dir=temp_cache_dir)
+    client = LLMClient(cache=cache, mock_provider=mock, max_retries=2)
+
+    resp = await client.generate(
+        role="nano",
+        messages=[{"role": "user", "content": "Check liquidity risk with 429 retry"}],
+        use_cache=False,
+    )
+    assert "Credit facility covenants" in resp.content
+    assert mock.call_counts["nano"] == 2

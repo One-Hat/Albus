@@ -74,6 +74,73 @@ class ModelConfigManager:
         )
 
 
+def repair_truncated_json(raw_text: str) -> Optional[str]:
+    """
+    Attempt heuristic recovery of JSON truncated by token limits.
+    Handles unclosed strings, unmatched brackets '[' and braces '{',
+    and trailing commas or colons.
+    """
+    text = raw_text.strip()
+    if not text:
+        return None
+
+    # Strip markdown code blocks if present
+    if text.startswith("```json"):
+        text = text[len("```json"):].strip()
+    elif text.startswith("```"):
+        text = text[len("```"):].strip()
+    if text.endswith("```"):
+        text = text[:-3].strip()
+
+    stack: List[str] = []
+    in_string = False
+    escape = False
+
+    for ch in text:
+        if escape:
+            escape = False
+            continue
+        if ch == "\\":
+            escape = True
+            continue
+        if ch == '"':
+            in_string = not in_string
+            continue
+        if not in_string:
+            if ch in "{[":
+                stack.append(ch)
+            elif ch == "}":
+                if stack and stack[-1] == "{":
+                    stack.pop()
+            elif ch == "]":
+                if stack and stack[-1] == "[":
+                    stack.pop()
+
+    repaired = text
+    if in_string:
+        repaired += '"'
+
+    repaired_strip = repaired.rstrip()
+    if repaired_strip.endswith(":"):
+        repaired_strip += " null"
+    elif repaired_strip.endswith(","):
+        repaired_strip = repaired_strip[:-1].rstrip()
+    repaired = repaired_strip
+
+    # Close remaining unmatched openers in reverse order
+    for opener in reversed(stack):
+        if opener == "{":
+            repaired += "}"
+        elif opener == "[":
+            repaired += "]"
+
+    try:
+        json.loads(repaired)
+        return repaired
+    except Exception:
+        return None
+
+
 class LLMResponse(BaseModel):
     content: str
     reasoning: Optional[str] = None
@@ -140,29 +207,37 @@ class LLMClient:
         output_cost = (completion_tokens / 1_000_000.0) * model_cfg.cost_per_1m_output_tokens_usd
         return round(input_cost + output_cost, 6)
 
-    def _extract_reasoning_and_content(self, message: Any) -> tuple[str, Optional[str]]:
+    def _extract_reasoning_and_content(
+        self,
+        message: Any,
+        finish_reason: Optional[str] = None,
+    ) -> tuple[str, Optional[str]]:
         """
-        Extract content and reasoning. Nemotron models emit reasoning either via
-        message.reasoning / message.reasoning_content or in <thought> tags.
+        Extract content and reasoning across diverse reasoning-model output shapes:
+        - standard content field
+        - reasoning / reasoning_content fields
+        - inline <thought> tags
+        - answer only in reasoning_content/reasoning when content is empty
+        - empty content with finish_reason='length'
         """
         content = ""
         reasoning = None
 
         if hasattr(message, "content") and message.content:
             content = str(message.content).strip()
-        elif isinstance(message, dict) and "content" in message:
+        elif isinstance(message, dict) and "content" in message and message["content"] is not None:
             content = str(message["content"]).strip()
 
-        # Check for reasoning field from SDK / API
-        if hasattr(message, "reasoning") and message.reasoning:
-            reasoning = str(message.reasoning).strip()
-        elif hasattr(message, "reasoning_content") and message.reasoning_content:
+        # Check for reasoning field from SDK / API / dictionary
+        if hasattr(message, "reasoning_content") and message.reasoning_content:
             reasoning = str(message.reasoning_content).strip()
+        elif hasattr(message, "reasoning") and message.reasoning:
+            reasoning = str(message.reasoning).strip()
         elif isinstance(message, dict):
-            if "reasoning" in message and message["reasoning"]:
-                reasoning = str(message["reasoning"]).strip()
-            elif "reasoning_content" in message and message["reasoning_content"]:
+            if "reasoning_content" in message and message["reasoning_content"]:
                 reasoning = str(message["reasoning_content"]).strip()
+            elif "reasoning" in message and message["reasoning"]:
+                reasoning = str(message["reasoning"]).strip()
 
         # Check for inline <thought> tags if reasoning was not returned separately
         if not reasoning and "<thought>" in content and "</thought>" in content:
@@ -170,6 +245,30 @@ class LLMClient:
             end = content.find("</thought>")
             reasoning = content[start:end].strip()
             content = (content[:start - len("<thought>")] + content[end + len("</thought>"):]).strip()
+
+        # Handle empty content with finish_reason='length'
+        if finish_reason == "length" and not content:
+            err_msg = (
+                "LLM generation truncated: output reached max_tokens (finish_reason='length') "
+                "before emitting content."
+            )
+            if reasoning:
+                err_msg += f" (Partial reasoning: {reasoning[:300]})"
+            raise RuntimeError(err_msg)
+
+        # Handle answer only in reasoning_content or reasoning when content is empty
+        if not content and reasoning:
+            # Check if there is an embedded JSON or code block in reasoning
+            if "```json" in reasoning:
+                s_idx = reasoning.find("```json") + len("```json")
+                e_idx = reasoning.find("```", s_idx)
+                content = reasoning[s_idx:e_idx].strip() if e_idx != -1 else reasoning[s_idx:].strip()
+            elif "```" in reasoning:
+                s_idx = reasoning.find("```") + len("```")
+                e_idx = reasoning.find("```", s_idx)
+                content = reasoning[s_idx:e_idx].strip() if e_idx != -1 else reasoning[s_idx:].strip()
+            else:
+                content = reasoning
 
         return content, reasoning
 
@@ -236,9 +335,10 @@ class LLMClient:
                             messages=messages,
                             **params,
                         )
-                        content, reasoning = self._extract_reasoning_and_content(raw_result)
-                        prompt_tokens = raw_result.get("prompt_tokens", 0)
-                        completion_tokens = raw_result.get("completion_tokens", 0)
+                        finish_reason = raw_result.get("finish_reason") if isinstance(raw_result, dict) else None
+                        content, reasoning = self._extract_reasoning_and_content(raw_result, finish_reason=finish_reason)
+                        prompt_tokens = raw_result.get("prompt_tokens", 0) if isinstance(raw_result, dict) else 0
+                        completion_tokens = raw_result.get("completion_tokens", 0) if isinstance(raw_result, dict) else 0
                     else:
                         if self._client is None:
                             raise ValueError(
@@ -253,7 +353,10 @@ class LLMClient:
                             **extra_params,
                         )
                         choice = completion.choices[0]
-                        content, reasoning = self._extract_reasoning_and_content(choice.message)
+                        finish_reason = getattr(choice, "finish_reason", None)
+                        content, reasoning = self._extract_reasoning_and_content(
+                            choice.message, finish_reason=finish_reason
+                        )
                         prompt_tokens = completion.usage.prompt_tokens if completion.usage else 0
                         completion_tokens = completion.usage.completion_tokens if completion.usage else 0
 
@@ -300,7 +403,31 @@ class LLMClient:
                         # Rule 5: No bare except and no silent fallbacks. Fail loudly with a clear error.
                         raise RuntimeError(f"LLM generation failed for {role} ({model_cfg.id}): {e}") from e
 
-                    await asyncio.sleep(backoff_delay)
+                    # Extract Retry-After if present (e.g. from HTTP 429 response headers)
+                    retry_after_sec: Optional[float] = None
+                    resp_obj = getattr(e, "response", None)
+                    headers = getattr(resp_obj, "headers", None) or getattr(e, "headers", None)
+                    if headers and hasattr(headers, "get"):
+                        val = headers.get("retry-after") or headers.get("Retry-After")
+                        if val is not None:
+                            try:
+                                retry_after_sec = float(val)
+                            except (ValueError, TypeError):
+                                pass
+                    elif hasattr(e, "retry_after"):
+                        try:
+                            retry_after_sec = float(getattr(e, "retry_after"))
+                        except (ValueError, TypeError):
+                            pass
+
+                    sleep_duration = max(retry_after_sec or 0.0, backoff_delay)
+                    if retry_after_sec is not None:
+                        logger.warning(
+                            f"HTTP 429 rate limit received with Retry-After={retry_after_sec}s. "
+                            f"Sleeping for {sleep_duration}s."
+                        )
+
+                    await asyncio.sleep(sleep_duration)
                     backoff_delay *= 2.0
 
             raise RuntimeError(f"Exceeded max retries ({self.max_retries}) for model {role}")
@@ -363,6 +490,18 @@ class LLMClient:
                 validated = response_model.model_validate(data)
                 return validated
             except (json.JSONDecodeError, ValidationError) as err:
+                # If direct parse failed, attempt heuristic repair for truncated JSON
+                if isinstance(err, json.JSONDecodeError):
+                    repaired_json = repair_truncated_json(raw_text)
+                    if repaired_json:
+                        try:
+                            data = json.loads(repaired_json)
+                            validated = response_model.model_validate(data)
+                            logger.info("Successfully recovered truncated JSON via heuristic bracket repair.")
+                            return validated
+                        except Exception:
+                            pass
+
                 if repair_attempt >= max_repairs:
                     # Rule 5: Fail loudly with a clear error
                     raise ValidationError.from_exception_data(
@@ -382,12 +521,23 @@ class LLMClient:
                 )
                 # Append repair prompt
                 history.append({"role": "assistant", "content": response.content})
+                is_truncated = isinstance(err, json.JSONDecodeError) and (
+                    raw_text.endswith(",") or raw_text.endswith(":") or raw_text.count("{") > raw_text.count("}")
+                )
+                repair_msg = (
+                    f"Your output failed validation against the schema with the following error:\n{err}\n"
+                )
+                if is_truncated:
+                    repair_msg += (
+                        "Notice: Your previous response was truncated mid-JSON. "
+                        "Please provide the complete, closed JSON object strictly matching the schema."
+                    )
+                else:
+                    repair_msg += "Please correct the JSON and return ONLY the valid JSON object without commentary."
+
                 history.append({
                     "role": "user",
-                    "content": (
-                        f"Your output failed validation against the schema with the following error:\n{err}\n"
-                        f"Please correct the JSON and return ONLY the valid JSON object without commentary."
-                    ),
+                    "content": repair_msg,
                 })
 
         raise RuntimeError("Unexpected exit from repair loop.")

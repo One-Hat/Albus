@@ -82,12 +82,20 @@ class MockLLM:
             # Check failing sequence
             if lookup_key in self.failing_sequences:
                 fstate = self.failing_sequences[lookup_key]
-                if fstate["current_fails"] < fstate["fail_count"]:
-                    fstate["current_fails"] += 1
-                    raise RuntimeError(f"Simulated rate limit error 429 for {lookup_key}")
+                current_fails = fstate.get("current_fails", 0)
+                if current_fails < fstate["fail_count"]:
+                    fstate["current_fails"] = current_fails + 1
+                    err_cls = fstate.get("exception_class", RuntimeError)
+                    err_msg = fstate.get("error_message", f"Simulated rate limit error 429 for {lookup_key}")
+                    exc = err_cls(err_msg)
+                    if "headers" in fstate:
+                        exc.headers = fstate["headers"]
+                    if "retry_after" in fstate:
+                        exc.retry_after = fstate["retry_after"]
+                    raise exc
                 return {
                     "content": fstate["success_content"],
-                    "reasoning": fstate["success_reasoning"],
+                    "reasoning": fstate.get("success_reasoning", "Mock reasoning after retry"),
                     "prompt_tokens": 80,
                     "completion_tokens": 40,
                     "model": model_id,
@@ -96,24 +104,34 @@ class MockLLM:
             # Check sequence
             if lookup_key in self.registered_sequences and self.registered_sequences[lookup_key]:
                 resp = self.registered_sequences[lookup_key].pop(0)
-                return {
+                out = {
                     "content": resp.get("content", ""),
-                    "reasoning": resp.get("reasoning", "Mock sequential reasoning"),
                     "prompt_tokens": resp.get("prompt_tokens", 100),
                     "completion_tokens": resp.get("completion_tokens", 50),
                     "model": model_id,
                 }
+                if "reasoning" in resp:
+                    out["reasoning"] = resp["reasoning"]
+                elif "reasoning_content" in resp:
+                    out["reasoning_content"] = resp["reasoning_content"]
+                out.update({k: v for k, v in resp.items() if k not in out})
+                return out
 
             # Check static response
             if lookup_key in self.registered_responses:
                 resp = self.registered_responses[lookup_key]
-                return {
-                    "content": resp["content"],
-                    "reasoning": resp["reasoning"],
-                    "prompt_tokens": resp["prompt_tokens"],
-                    "completion_tokens": resp["completion_tokens"],
+                out = {
+                    "content": resp.get("content", ""),
+                    "prompt_tokens": resp.get("prompt_tokens", 100),
+                    "completion_tokens": resp.get("completion_tokens", 50),
                     "model": model_id,
                 }
+                if "reasoning" in resp:
+                    out["reasoning"] = resp["reasoning"]
+                elif "reasoning_content" in resp:
+                    out["reasoning_content"] = resp["reasoning_content"]
+                out.update({k: v for k, v in resp.items() if k not in out})
+                return out
 
             # Default fallback response
             return {
