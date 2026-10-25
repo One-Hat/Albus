@@ -1,7 +1,7 @@
 [project]
-name = "quant-research-copilot"
+name = "albus"
 version = "0.1.0"
-description = "Quant Research Copilot + Self-Calibrating Forecasting Swarm"
+description = "ALBUS: Quant Research Copilot + Self-Calibrating Forecasting Swarm"
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.11"
