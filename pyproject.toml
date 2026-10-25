@@ -1,0 +1,37 @@
+[project]
+name = "quant-research-copilot"
+version = "0.1.0"
+description = "Quant Research Copilot + Self-Calibrating Forecasting Swarm"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic>=2.7.0",
+    "openai>=1.30.0",
+    "yfinance>=0.2.40",
+    "pandas>=2.2.0",
+    "numpy>=1.26.0",
+    "scipy>=1.13.0",
+    "scikit-learn>=1.4.0",
+    "streamlit>=1.35.0",
+    "httpx>=0.27.0",
+    "pyyaml>=6.0.1",
+    "beautifulsoup4>=4.12.0",
+    "lxml>=5.2.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.2.0",
+    "pytest-asyncio>=0.23.0",
+    "pre-commit>=3.7.0"
+]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+pythonpath = ["src"]
+asyncio_mode = "auto"
+filterwarnings = [
+    "ignore::DeprecationWarning"
+]

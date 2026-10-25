@@ -1,0 +1,60 @@
+# Python & Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Distribution / Packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Environments & Secrets
+.env
+*.env
+*.pem
+*.key
+*.token
+secrets.json
+service_account.json
+
+# Caches & IDEs
+.cache/
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Streamlit & Local App Storage
+.streamlit/secrets.toml
+data/raw/
+data/cache/
+results/cache/
+logs/*.log
+*.log
