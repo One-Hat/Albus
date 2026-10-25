@@ -30,7 +30,7 @@ dev = [
 [tool.pytest.ini_options]
 minversion = "7.0"
 testpaths = ["tests"]
-pythonpath = ["src"]
+pythonpath = [".", "src"]
 asyncio_mode = "auto"
 addopts = "-p no:cacheprovider"
 filterwarnings = [
