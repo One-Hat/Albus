@@ -15,7 +15,11 @@ from typing import Optional
 class HealthHandler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         if self.path in ("/health", "/healthz", "/"):
-            is_live = bool(os.environ.get("NEBIUS_API_KEY", "").strip())
+            is_live = bool(
+                os.environ.get("NEBIUS_API_KEY", "").strip()
+                or os.environ.get("GROQ_API_KEY", "").strip()
+                or os.environ.get("OPENROUTER_API_KEY", "").strip()
+            )
             payload = {
                 "status": "healthy",
                 "service": "albus-quant-copilot",

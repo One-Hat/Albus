@@ -55,7 +55,7 @@ def test_opensource_provider_groq_and_openrouter_resolution(monkeypatch):
     monkeypatch.setenv("GROQ_API_KEY", "gsk_synthetic_test_key_12345")
 
     client = LLMClient()
-    assert client.config_manager.models["super"].id == "llama-3.3-70b-versatile"
+    assert client.config_manager.models["super"].id == "openai/gpt-oss-120b"
     assert client.config_manager.endpoints["base_url"] == "https://api.groq.com/openai/v1"
 
     monkeypatch.delenv("GROQ_API_KEY", raising=False)

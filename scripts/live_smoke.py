@@ -12,6 +12,9 @@ import time
 from pathlib import Path
 from typing import Dict, List
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+
 # Ensure project root is in sys.path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
@@ -27,19 +30,20 @@ PROBES: Dict[str, str] = {
 
 
 async def run_live_smoke() -> None:
-    api_key = os.environ.get("NEBIUS_API_KEY")
+    api_key = os.environ.get("NEBIUS_API_KEY") or os.environ.get("GROQ_API_KEY") or os.environ.get("OPENROUTER_API_KEY")
     if not api_key:
-        print("[ERROR] NEBIUS_API_KEY is not set in the environment.")
+        print("[ERROR] Neither NEBIUS_API_KEY, GROQ_API_KEY, nor OPENROUTER_API_KEY is set.")
         print("Per AGENTS.md Rule 7, secrets must be read from environment.")
-        print("Cannot run live smoke test without a funded Nebius Token Factory API key.")
+        print("Cannot run live smoke test without a live API key in environment or .env file.")
         sys.exit(1)
 
+    provider = "Nebius" if os.environ.get("NEBIUS_API_KEY") else ("Groq" if os.environ.get("GROQ_API_KEY") else "OpenRouter")
     print("=" * 70)
-    print("ALBUS -- LIVE NEBIUS REASONING SMOKE TEST (OBSERVE-ONLY)")
+    print(f"ALBUS -- LIVE {provider.upper()} REASONING SMOKE TEST (OBSERVE-ONLY)")
     print("=" * 70)
 
     mgr = ModelConfigManager("config/models.yaml")
-    client = LLMClient(config_path="config/models.yaml", use_cache=False)
+    client = LLMClient(config_path="config/models.yaml")
 
     print(f"Base URL: {client.config_manager.endpoints.get('base_url')}")
     print(f"Concurrency Limit: {client.concurrency_limit}")

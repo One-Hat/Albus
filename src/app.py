@@ -33,19 +33,28 @@ st.set_page_config(
 # Mode Banner Enforcement (W6 Gate)
 # The app MUST show a visible MOCK or CACHED DEMO banner whenever not live.
 # -----------------------------------------------------------------------------
-is_live = bool(os.environ.get("NEBIUS_API_KEY", "").strip())
+is_live = bool(
+    os.environ.get("NEBIUS_API_KEY", "").strip()
+    or os.environ.get("GROQ_API_KEY", "").strip()
+    or os.environ.get("OPENROUTER_API_KEY", "").strip()
+)
+provider_name = (
+    "Nebius Token Factory"
+    if os.environ.get("NEBIUS_API_KEY")
+    else ("Groq Cloud (Open-Source)" if os.environ.get("GROQ_API_KEY") else "OpenRouter")
+)
 
 if not is_live:
     st.error(
-        "⚠️ **CACHED DEMO / MOCK MODE ACTIVE** -- No live Nebius API key detected. "
+        "⚠️ **CACHED DEMO / MOCK MODE ACTIVE** -- No live API key detected. "
         "Running entirely offline against verified SEC EDGAR filings, hand-audited fixtures, "
         "and cached model artifacts. Every displayed metric is derived from local execution logs. "
         "No live API calls are being billed."
     )
 else:
     st.success(
-        "🟢 **LIVE MODE ACTIVE** -- Authenticated to Nebius Token Factory "
-        "(Nemotron-3 Nano 30B, Super 120B, Ultra 550B)."
+        f"🟢 **LIVE MODE ACTIVE** -- Authenticated to {provider_name} "
+        "(Real-time LLM inference active)."
     )
 
 st.title("ALBUS: Quant Research Copilot + Self-Calibrating Forecasting Swarm")

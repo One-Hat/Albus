@@ -40,9 +40,9 @@ providers:
   groq:
     base_url: "https://api.groq.com/openai/v1"
     models:
-      nano: "llama-3.1-8b-instant"
-      super: "llama-3.3-70b-versatile"
-      ultra: "llama-3.3-70b-versatile"
+      nano: "openai/gpt-oss-20b"
+      super: "openai/gpt-oss-120b"
+      ultra: "openai/gpt-oss-120b"
 
   openrouter:
     base_url: "https://openrouter.ai/api/v1"

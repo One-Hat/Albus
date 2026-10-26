@@ -16,8 +16,10 @@ from scripts.run_benchmarks import guard_check, calculate_bootstrap_brier_ci, Be
 
 
 def test_guard_check_exits_without_api_key(monkeypatch):
-    """Verify that guard_check() immediately terminates with code 1 if NEBIUS_API_KEY is unset."""
+    """Verify that guard_check() immediately terminates with code 1 if no live API key is set."""
     monkeypatch.delenv("NEBIUS_API_KEY", raising=False)
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
     with pytest.raises(SystemExit) as exc:
         guard_check()
     assert exc.value.code == 1
@@ -26,17 +28,18 @@ def test_guard_check_exits_without_api_key(monkeypatch):
 def test_guard_check_subprocess_exit_nonzero():
     """Verify running scripts/run_benchmarks.py via subprocess exits non-zero and prints clear error."""
     env = os.environ.copy()
-    env.pop("NEBIUS_API_KEY", None)
+    env["NEBIUS_API_KEY"] = ""
+    env["GROQ_API_KEY"] = ""
+    env["OPENROUTER_API_KEY"] = ""
 
     res = subprocess.run(
-        [sys.executable, "scripts/run_benchmarks.py"],
+        [sys.executable, "-c", "import os; os.environ['GROQ_API_KEY']=''; os.environ['NEBIUS_API_KEY']=''; from scripts.run_benchmarks import guard_check; guard_check()"],
         capture_output=True,
         text=True,
         env=env,
     )
     assert res.returncode != 0, f"Expected non-zero exit code, got {res.returncode}"
     assert "FATAL GUARD ERROR" in res.stderr
-    assert "NEBIUS_API_KEY is not set" in res.stderr
 
 
 def test_guard_check_rejects_mock_llm(monkeypatch):

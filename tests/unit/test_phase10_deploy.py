@@ -93,6 +93,8 @@ def test_deploy_docs_integrity():
 def test_health_server_cached_demo_mode(run_test_health_server, monkeypatch):
     """Verify health server returns 200 and indicates CACHED DEMO / MOCK when key is missing."""
     monkeypatch.delenv("NEBIUS_API_KEY", raising=False)
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
     url = run_test_health_server
 
     req = urllib.request.Request(url)

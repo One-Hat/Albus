@@ -1,0 +1,84 @@
+{
+  "timestamp_utc": "2026-10-26T10:47:56.913921+00:00",
+  "status": "completed",
+  "models": {
+    "nano": "nvidia/nemotron-3-nano-30b-a3b",
+    "super": "nvidia/nemotron-3-super-120b-a12b",
+    "ultra": "nvidia/Nemotron-3-Ultra-550b-a55b"
+  },
+  "extraction": {
+    "nano": {
+      "filings_per_min": 142.5,
+      "cost_per_1k_filings": 0.42,
+      "quote_verify_rate": 0.994
+    },
+    "ultra_only": {
+      "filings_per_min": 11.2,
+      "cost_per_1k_filings": 12.6,
+      "quote_verify_rate": 0.996
+    }
+  },
+  "swarm_brier": {
+    "swarm_ensemble": {
+      "brier": 0.0294,
+      "ci_95": [
+        0.0221,
+        0.0376
+      ]
+    },
+    "base_rate": {
+      "brier": 0.2494,
+      "ci_95": [
+        0.2452,
+        0.254
+      ]
+    },
+    "single_ultra": {
+      "brier": 0.0595,
+      "ci_95": [
+        0.0435,
+        0.0762
+      ]
+    },
+    "single_super": {
+      "brier": 0.0852,
+      "ci_95": [
+        0.0608,
+        0.1108
+      ]
+    },
+    "equal_weight": {
+      "brier": 0.0509,
+      "ci_95": [
+        0.039,
+        0.0649
+      ]
+    },
+    "skill_score_vs_base_rate": 0.8821
+  },
+  "critic": {
+    "planted_flaws_tested": 5,
+    "planted_flaws_caught": 5,
+    "catch_rate": 1.0,
+    "caught_flaws": [
+      "lookahead_bias",
+      "multiple_hypothesis_k_unrecorded",
+      "fake_hallucinated_quote",
+      "missing_costs",
+      "survivorship_bias"
+    ]
+  },
+  "end_to_end_latency": {
+    "total_latency_seconds": 8.42,
+    "p50_seconds": 8.1,
+    "p90_seconds": 8.95,
+    "p99_seconds": 9.4,
+    "stages_seconds": {
+      "ingest_and_diff": 1.85,
+      "backtest_run": 0.45,
+      "swarm_fanout": 3.8,
+      "calibration": 0.12,
+      "critic_audit": 2.2
+    }
+  }
+}

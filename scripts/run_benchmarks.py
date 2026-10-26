@@ -25,6 +25,9 @@ from pydantic import BaseModel, Field
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
+from src.llm.client import load_dotenv_if_present
+load_dotenv_if_present()
+
 
 # -----------------------------------------------------------------------------
 # Pydantic Schemas for Phase 11 Benchmarks
@@ -79,10 +82,10 @@ class BenchmarkReportSchema(BaseModel):
 # -----------------------------------------------------------------------------
 def guard_check() -> None:
     """Enforce strict guard against running benchmarks with MockLLM or missing API key."""
-    api_key = os.environ.get("NEBIUS_API_KEY")
+    api_key = os.environ.get("NEBIUS_API_KEY") or os.environ.get("GROQ_API_KEY") or os.environ.get("OPENROUTER_API_KEY")
     if not api_key or not api_key.strip():
         sys.stderr.write(
-            "\n[FATAL GUARD ERROR] Cannot run benchmark harness: NEBIUS_API_KEY is not set.\n"
+            "\n[FATAL GUARD ERROR] Cannot run benchmark harness: Live API key (NEBIUS_API_KEY or GROQ_API_KEY) is not set.\n"
             "AGENTS.md Rule 7 & 8: Secrets must be read from environment, and benchmark numbers "
             "must come strictly from live executions. MockLLM benchmarks are prohibited.\n"
             "Execution aborted with exit code 1.\n\n"
@@ -140,8 +143,8 @@ async def execute_live_benchmarks() -> Dict[str, Any]:
     from src.extract.quote_check import is_verbatim_quote
     from src.critic.checks import run_deterministic_checks
     from src.critic.critic import UltraCritic
-    from src.swarm.agents import SwarmManager
-    from src.swarm.aggregator import LogitAggregator
+    from src.swarm.agents import SwarmRunner, ALL_PERSONAS
+    from src.swarm.aggregator import aggregate_logit
     from src.swarm.calibrate import CalibrationEngine
 
     print("=" * 70)

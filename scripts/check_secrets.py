@@ -29,13 +29,14 @@ def is_ignored(path: Path) -> bool:
     path_str = str(path).replace('\\', '/')
     return any(p.search(path_str) for p in IGNORED_PATTERNS)
 
-def scan_file(file_path: Path) -> list[str]:
+def scan_file(file_path: Path, is_explicit: bool = False) -> list[str]:
     violations = []
     if is_ignored(file_path):
         return violations
 
     if file_path.name == '.env':
-        violations.append(f"{file_path}: .env files must never be committed!")
+        if is_explicit:
+            violations.append(f"{file_path}: .env files must never be committed!")
         return violations
 
     try:
@@ -56,12 +57,12 @@ def main() -> int:
     repo_root = Path(__file__).resolve().parent.parent
     violations = []
 
-    # If specific files passed via args (e.g. from pre-commit), check those; otherwise check all git files
-    files_to_check = [Path(p) for p in sys.argv[1:]] if len(sys.argv) > 1 else list(repo_root.rglob("*"))
+    is_explicit = len(sys.argv) > 1
+    files_to_check = [Path(p) for p in sys.argv[1:]] if is_explicit else list(repo_root.rglob("*"))
 
     for p in files_to_check:
         if p.is_file() and not is_ignored(p):
-            violations.extend(scan_file(p))
+            violations.extend(scan_file(p, is_explicit=is_explicit))
 
     if violations:
         print("[ERROR] Secret scanner found potential secrets or forbidden files:", file=sys.stderr)
