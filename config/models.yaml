@@ -29,6 +29,28 @@ models:
     cost_per_1m_input_tokens_usd: 3.00
     cost_per_1m_output_tokens_usd: 6.00
 
+providers:
+  nebius:
+    base_url: "https://api.tokenfactory.nebius.com/v1"
+    models:
+      nano: "nvidia/nemotron-3-nano-30b-a3b"
+      super: "nvidia/nemotron-3-super-120b-a12b"
+      ultra: "nvidia/Nemotron-3-Ultra-550b-a55b"
+
+  groq:
+    base_url: "https://api.groq.com/openai/v1"
+    models:
+      nano: "llama-3.1-8b-instant"
+      super: "llama-3.3-70b-versatile"
+      ultra: "llama-3.3-70b-versatile"
+
+  openrouter:
+    base_url: "https://openrouter.ai/api/v1"
+    models:
+      nano: "meta-llama/llama-3.1-8b-instruct"
+      super: "meta-llama/llama-3.3-70b-instruct"
+      ultra: "qwen/qwen-2.5-72b-instruct"
+
 endpoints:
   base_url: "https://api.tokenfactory.nebius.com/v1"  # VERIFY against active Nebius deployment
   timeout_seconds: 60

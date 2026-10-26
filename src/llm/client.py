@@ -40,12 +40,33 @@ class ModelConfig(BaseModel):
     cost_per_1m_output_tokens_usd: float = 0.0
 
 
+def load_dotenv_if_present(env_path: str | Path = ".env") -> None:
+    """Load environment variables from a local .env file if present, without external dependencies."""
+    p = Path(env_path)
+    if p.is_file():
+        for line in p.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            k, v = line.split("=", 1)
+            k = k.strip()
+            v = v.strip().strip("'\"")
+            if k not in os.environ:
+                os.environ[k] = v
+
+
+# Automatically attempt to load local .env if present
+load_dotenv_if_present()
+
+
 class ModelConfigManager:
     """
     Loads and manages model IDs strictly from config/models.yaml (Rule 3).
+    Supports provider profiles for Nebius Token Factory, Groq, and OpenRouter.
     """
 
-    def __init__(self, config_path: str | Path = "config/models.yaml"):
+    def __init__(self, config_path: str | Path = "config/models.yaml", provider: Optional[str] = None):
+        load_dotenv_if_present()
         self.config_path = Path(config_path)
         if not self.config_path.is_file():
             raise FileNotFoundError(
@@ -59,7 +80,24 @@ class ModelConfigManager:
         for role, spec in data.get("models", {}).items():
             self.models[role] = ModelConfig(**spec)
 
+        self.providers = data.get("providers", {})
         self.endpoints = data.get("endpoints", {})
+
+        # Active provider determination
+        active_provider = (
+            provider
+            or os.environ.get("LLM_PROVIDER")
+            or ("groq" if os.environ.get("GROQ_API_KEY") else None)
+            or ("openrouter" if os.environ.get("OPENROUTER_API_KEY") else None)
+        )
+        if active_provider and active_provider.lower() in self.providers and not os.environ.get("NEBIUS_API_KEY"):
+            p_info = self.providers[active_provider.lower()]
+            p_models = p_info.get("models", {})
+            for role, mid in p_models.items():
+                if role in self.models:
+                    self.models[role] = self.models[role].model_copy(update={"id": mid})
+            if "base_url" in p_info:
+                self.endpoints["base_url"] = p_info["base_url"]
 
     def get_model(self, role_or_id: str) -> ModelConfig:
         if role_or_id in self.models:
@@ -182,10 +220,17 @@ class LLMClient:
 
         if mock_provider is None:
             # Rule 7: Read secrets strictly from environment
-            resolved_key = api_key or os.environ.get("NEBIUS_API_KEY")
+            resolved_key = (
+                api_key
+                or os.environ.get("NEBIUS_API_KEY")
+                or os.environ.get("GROQ_API_KEY")
+                or os.environ.get("OPENROUTER_API_KEY")
+                or os.environ.get("OPENAI_API_KEY")
+            )
             resolved_url = (
                 base_url
                 or os.environ.get("NEBIUS_BASE_URL")
+                or os.environ.get("OPENAI_BASE_URL")
                 or self.config_manager.endpoints.get("base_url", "https://api.tokenfactory.nebius.com/v1")
             )
             if not resolved_key:

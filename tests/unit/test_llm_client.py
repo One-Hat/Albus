@@ -49,6 +49,22 @@ def test_models_config_yaml():
     assert ultra_m.id.startswith("nvidia/")
 
 
+def test_opensource_provider_groq_and_openrouter_resolution(monkeypatch):
+    """Verify that setting GROQ_API_KEY or OPENROUTER_API_KEY routes to open-source models without guessing IDs."""
+    monkeypatch.delenv("NEBIUS_API_KEY", raising=False)
+    monkeypatch.setenv("GROQ_API_KEY", "gsk_synthetic_test_key_12345")
+
+    client = LLMClient()
+    assert client.config_manager.models["super"].id == "llama-3.3-70b-versatile"
+    assert client.config_manager.endpoints["base_url"] == "https://api.groq.com/openai/v1"
+
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
+    monkeypatch.setenv("OPENROUTER_API_KEY", "sk-or-v1-synthetic_test_key_12345")
+    client_or = LLMClient()
+    assert client_or.config_manager.models["super"].id == "meta-llama/llama-3.3-70b-instruct"
+    assert client_or.config_manager.endpoints["base_url"] == "https://openrouter.ai/api/v1"
+
+
 def test_disk_cache(temp_cache_dir):
     """Verify cache store, retrieve, key hashing, and miss behavior."""
     cache = DiskCache(cache_dir=temp_cache_dir)
