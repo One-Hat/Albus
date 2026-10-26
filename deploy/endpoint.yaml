@@ -1,0 +1,29 @@
+# Nebius Serverless AI Endpoint Manifest: ALBUS Copilot
+# Reference: https://docs.nebius.com/serverless/endpoints/
+apiVersion: serverless.nebius.ai/v1alpha1
+kind: Endpoint
+metadata:
+  name: albus-copilot
+  parent_id: ${NEBIUS_PROJECT_ID}
+spec:
+  image: ${CONTAINER_REGISTRY_IMAGE:-cr.nebius.cloud/albus:v0.1.0}
+  ports:
+    - container_port: 8080
+      protocol: HTTP
+      path: /health
+      name: health-probe
+    - container_port: 8501
+      protocol: HTTP
+      public: true
+      name: streamlit-ui
+  resources:
+    platform: cpu-d3
+    preset: 2vcpu-8gb
+  env:
+    - name: SEC_USER_AGENT
+      value: "ALBUS-Research/1.0 (research@example.com)"
+    - name: NEBIUS_BASE_URL
+      value: "https://api.tokenfactory.nebius.com/v1"
+  secrets:
+    - name: NEBIUS_API_KEY
+      secret_ref: nebius-token-factory-key

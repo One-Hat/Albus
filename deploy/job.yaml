@@ -1,0 +1,21 @@
+# Nebius Serverless AI Job Manifest: Batch Benchmarks & Swarm
+# Reference: https://docs.nebius.com/serverless/jobs/
+apiVersion: serverless.nebius.ai/v1alpha1
+kind: Job
+metadata:
+  name: albus-batch-benchmark
+  parent_id: ${NEBIUS_PROJECT_ID}
+spec:
+  image: ${CONTAINER_REGISTRY_IMAGE:-cr.nebius.cloud/albus:v0.1.0}
+  platform: gpu-l40s-a
+  preset: 1gpu-8vcpu-32gb
+  command: ["python"]
+  args: ["scripts/run_benchmarks.py"]
+  timeout: 30m
+  restart_policy: on-failure
+  env:
+    - name: SEC_USER_AGENT
+      value: "ALBUS-Research/1.0 (research@example.com)"
+  secrets:
+    - name: NEBIUS_API_KEY
+      secret_ref: nebius-token-factory-key
