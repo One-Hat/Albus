@@ -91,6 +91,7 @@ class ModelConfigManager:
 
         # Active provider determination: only switch if provider or LLM_PROVIDER is explicitly set
         active_provider = provider or os.environ.get("LLM_PROVIDER")
+        self.active_provider = (active_provider or "nebius").lower()
         if active_provider and active_provider.lower() in self.providers and active_provider.lower() != "nebius":
             p_info = self.providers[active_provider.lower()]
             p_models = p_info.get("models", {})

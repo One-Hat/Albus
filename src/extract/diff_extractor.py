@@ -46,9 +46,10 @@ class DiffExtractor:
         schema_str = json.dumps(RawDiffOutput.model_json_schema(), indent=2)
         system_prompt = (
             "You are a quantitative financial filing analyst. Compare the company's Item 1A Risk Factors "
-            "from year t against year t-1. Identify newly added risk claims (new_risks), removed risk claims "
-            "(removed_risks), and estimate the overall tone_shift (-1.0 = much more negative/risky, "
-            "0.0 = neutral, +1.0 = much more positive/confident).\n"
+            "from year t against year t-1. Identify up to 2 most material newly added risk claims (new_risks), "
+            "up to 2 most material removed risk claims (removed_risks), and estimate the overall tone_shift "
+            "(-1.0 = much more negative/risky, 0.0 = neutral, +1.0 = much more positive/confident).\n"
+            "Keep your internal reasoning brief and direct.\n"
             "CRITICAL RULE: Every `quote` in `new_risks` MUST be an exact verbatim substring copied "
             "character-for-character from the Year t text. Every `quote` in `removed_risks` MUST be an "
             "exact verbatim substring copied character-for-character from the Year t-1 text.\n"

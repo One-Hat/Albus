@@ -1,60 +1,60 @@
 {
-  "timestamp_utc": "2026-10-26T10:47:56.913921+00:00",
+  "timestamp_utc": "2026-10-29T19:22:06.816483+00:00",
   "status": "completed",
   "models": {
-    "nano": "nvidia/nemotron-3-nano-30b-a3b",
-    "super": "nvidia/nemotron-3-super-120b-a12b",
-    "ultra": "nvidia/Nemotron-3-Ultra-550b-a55b"
+    "nano": "openai/gpt-oss-20b",
+    "super": "openai/gpt-oss-120b",
+    "ultra": "openai/gpt-oss-120b"
   },
   "extraction": {
     "nano": {
-      "filings_per_min": 142.5,
-      "cost_per_1k_filings": 0.42,
-      "quote_verify_rate": 0.994
+      "filings_per_min": 34.42,
+      "cost_per_1k_filings": 0.4865,
+      "quote_verify_rate": 1.0
     },
     "ultra_only": {
-      "filings_per_min": 11.2,
-      "cost_per_1k_filings": 12.6,
-      "quote_verify_rate": 0.996
+      "filings_per_min": 17.64,
+      "cost_per_1k_filings": 11.313,
+      "quote_verify_rate": 1.0
     }
   },
   "swarm_brier": {
     "swarm_ensemble": {
-      "brier": 0.0294,
+      "brier": 0.2582,
       "ci_95": [
-        0.0221,
-        0.0376
+        0.205,
+        0.3115
       ]
     },
     "base_rate": {
-      "brier": 0.2494,
+      "brier": 0.2194,
       "ci_95": [
-        0.2452,
-        0.254
+        0.1837,
+        0.2908
       ]
     },
     "single_ultra": {
-      "brier": 0.0595,
+      "brier": 0.2719,
       "ci_95": [
-        0.0435,
-        0.0762
+        0.1113,
+        0.4619
       ]
     },
     "single_super": {
-      "brier": 0.0852,
+      "brier": 0.2975,
       "ci_95": [
-        0.0608,
-        0.1108
+        0.1625,
+        0.4725
       ]
     },
     "equal_weight": {
-      "brier": 0.0509,
+      "brier": 0.3049,
       "ci_95": [
-        0.039,
-        0.0649
+        0.1955,
+        0.3896
       ]
     },
-    "skill_score_vs_base_rate": 0.8821
+    "skill_score_vs_base_rate": -0.1771
   },
   "critic": {
     "planted_flaws_tested": 5,
@@ -63,22 +63,22 @@
     "caught_flaws": [
       "lookahead_bias",
       "multiple_hypothesis_k_unrecorded",
-      "fake_hallucinated_quote",
       "missing_costs",
-      "survivorship_bias"
+      "inadequate_sample_size",
+      "mixed_forecast_kinds"
     ]
   },
   "end_to_end_latency": {
-    "total_latency_seconds": 8.42,
-    "p50_seconds": 8.1,
-    "p90_seconds": 8.95,
-    "p99_seconds": 9.4,
+    "total_latency_seconds": 30.811,
+    "p50_seconds": 22.124,
+    "p90_seconds": 23.188,
+    "p99_seconds": 23.427,
     "stages_seconds": {
-      "ingest_and_diff": 1.85,
-      "backtest_run": 0.45,
-      "swarm_fanout": 3.8,
-      "calibration": 0.12,
-      "critic_audit": 2.2
+      "ingest_and_diff": 11.648,
+      "backtest_run": 0.371,
+      "swarm_fanout": 10.425,
+      "calibration": 0.1169,
+      "critic_audit": 8.25
     }
   }
 }

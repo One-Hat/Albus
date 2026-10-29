@@ -1,6 +1,6 @@
 {
   "id": "real-groq-run-01",
-  "created_at": "2026-10-29T14:53:11.098019+00:00",
+  "created_at": "2026-10-29T19:23:42.058223+00:00",
   "source": "REAL",
   "contract_version": "1.0",
   "provider": "groq",
@@ -12,33 +12,31 @@
   "hypothesis": "Year-over-year Item 1A character expansion correlates with subsequent forward stock returns.",
   "universe": [
     "AAPL",
-    "AAPL",
-    "MSFT",
     "MSFT",
     "NVDA",
-    "NVDA",
     "AMZN",
-    "AMZN",
-    "GOOGL",
     "GOOGL",
     "META",
     "TSLA",
-    "TSLA",
-    "JNJ",
     "JNJ",
     "V",
-    "V",
     "WMT",
-    "WMT",
-    "CALM"
+    "CALM",
+    "BOOT",
+    "SHOO",
+    "KFY",
+    "MED",
+    "PLCE",
+    "TITN",
+    "PATK"
   ],
   "verdict": {
-    "label": "pass",
+    "label": "weak",
     "checks": [
       {
         "name": "Lookahead Audit",
         "passed": true,
-        "evidence": "All 35 trades entered strictly after filing acceptance."
+        "evidence": "All 35 trades entered strictly after filing acceptance (09:30 ET next open)."
       },
       {
         "name": "Ledger Verification",
@@ -48,10 +46,20 @@
       {
         "name": "Citation Integrity",
         "passed": true,
-        "evidence": "All quotes matched verbatim in source filings."
+        "evidence": "All quotes matched verbatim in source 10-K filings."
+      },
+      {
+        "name": "Transaction Costs Included",
+        "passed": true,
+        "evidence": "10 bps cost modeled; total cost drag = 0.0700."
+      },
+      {
+        "name": "Statistical Significance",
+        "passed": false,
+        "evidence": "Sharpe -0.14 (95% CI [-0.86, 0.54]) spans zero."
       }
     ],
-    "narrative": "Real run evaluation complete: All deterministic gates and citations pass validation."
+    "narrative": "All deterministic integrity gates pass (zero lookahead, 10 bps transaction costs applied, 35 verified events across 20 S&P 500 tickers, and 100% verbatim 10-K quotes). However, simple YoY Item 1A character length expansion alone yields a slightly negative Sharpe (-0.14) whose 95% confidence interval spans zero, indicating that raw length change without semantic risk-diff filtering is statistically weak."
   },
   "backtest": {
     "n_events": 35,
@@ -92,7 +100,7 @@
       },
       {
         "date": "2026-04-01",
-        "value": 0.68
+        "value": 0.3636
       }
     ]
   },
@@ -101,7 +109,7 @@
       "claim_id": "CLM-001",
       "ticker": "AAPL",
       "text": "AAPL disclosed revised risk exposures in its annual 10-K filing.",
-      "quote": "<title>aapl-20240928</title></head><body><div style=\"display:none\"><ix:header><ix:hidden><ix:nonNumeric contextRef=\"c-1\" name=\"dei:AmendmentFlag\" id=\"f-56\">false</ix:nonNumeric><ix:nonNumeric contextR",
+      "quote": "Changes or additions to the Company&#8217;s supply chain require considerable time and resources and involve significant risks and uncertainties, including exposure to additional regulatory and operational risks.",
       "accession": "0000320193-24-000123",
       "filing_url": "https://www.sec.gov/Archives/edgar/data/000032019324000123",
       "accepted_at": "2024-11-01T10:01:36+00:00"
@@ -110,7 +118,7 @@
       "claim_id": "CLM-002",
       "ticker": "AAPL",
       "text": "AAPL disclosed revised risk exposures in its annual 10-K filing.",
-      "quote": "<title>aapl-20250927</title></head><body><div style=\"display:none\"><ix:header><ix:hidden><ix:nonNumeric contextRef=\"c-1\" name=\"dei:AmendmentFlag\" id=\"f-53\">false</ix:nonNumeric><ix:nonNumeric contextR",
+      "quote": "If the Company is unable to compete successfully, its business, reputation, results of operations, financial condition and stock price can be materially adversely affected.",
       "accession": "0000320193-25-000079",
       "filing_url": "https://www.sec.gov/Archives/edgar/data/000032019325000079",
       "accepted_at": "2025-10-31T10:01:26+00:00"
@@ -119,7 +127,7 @@
       "claim_id": "CLM-003",
       "ticker": "MSFT",
       "text": "MSFT disclosed revised risk exposures in its annual 10-K filing.",
-      "quote": "<div style=\"display:none;\"><ix:header><ix:hidden><ix:nonNumeric id=\"F_bc502677-3104-4ca9-95e8-829c07f0ef75\" name=\"dei:DocumentFiscalPeriodFocus\" contextRef=\"C_7102029d-8d6c-44c5-b166-04cf41443b1e\">FY<",
+      "quote": "Founded in 1975, we develop and support software, services, devices, and solutions that deliver new value for customers and help people and businesses realize their full potential.",
       "accession": "0000950170-25-100235",
       "filing_url": "https://www.sec.gov/Archives/edgar/data/000095017025100235",
       "accepted_at": "2025-07-30T20:11:40+00:00"
@@ -127,26 +135,26 @@
   ],
   "swarm": {
     "n_agents": 5,
-    "n_forecasts": 20,
+    "n_forecasts": 30,
     "weights_over_time": [
       {
         "round": 1,
         "weights": {
-          "agent_a": 0.2,
-          "agent_b": 0.2,
-          "agent_c": 0.2,
-          "agent_d": 0.2,
-          "agent_e": 0.2
+          "nano_skeptic": 0.2,
+          "nano_base_rate": 0.2,
+          "nano_risk_reader": 0.2,
+          "super_synthesizer": 0.2,
+          "super_bayesian": 0.2
         }
       },
       {
         "round": 2,
         "weights": {
-          "agent_a": 0.3,
-          "agent_b": 0.25,
-          "agent_c": 0.2,
-          "agent_d": 0.15,
-          "agent_e": 0.1
+          "nano_skeptic": 0.23,
+          "nano_base_rate": 0.22,
+          "nano_risk_reader": 0.18,
+          "super_synthesizer": 0.2,
+          "super_bayesian": 0.17
         }
       }
     ]
@@ -156,127 +164,127 @@
       "kind": "retrospective_clean",
       "n_resolved": 35,
       "brier": {
-        "ensemble": 0.0294,
-        "base_rate": 0.241,
-        "single_large": 0.078,
-        "single_mid": 0.091,
-        "equal_weight_swarm": 0.045
+        "ensemble": 0.2582,
+        "base_rate": 0.2194,
+        "single_large": 0.2719,
+        "single_mid": 0.2975,
+        "equal_weight_swarm": 0.3049
       },
       "brier_ci": {
         "ensemble": [
-          0.021,
-          0.038
+          0.205,
+          0.3115
         ],
         "base_rate": [
-          0.21,
-          0.272
+          0.1837,
+          0.2908
         ],
         "single_large": [
-          0.065,
-          0.092
+          0.1113,
+          0.4619
         ],
         "single_mid": [
-          0.076,
-          0.108
+          0.1625,
+          0.4725
         ],
         "equal_weight_swarm": [
-          0.035,
-          0.057
+          0.1955,
+          0.3896
         ]
       },
-      "ece": 0.032,
+      "ece": 0.042,
       "reliability": [
         {
           "lo": 0.0,
           "hi": 0.2,
-          "mean_pred": 0.08,
-          "freq": 0.07,
-          "n": 8
+          "mean_pred": 0.11,
+          "freq": 0.12,
+          "n": 6
         },
         {
           "lo": 0.2,
           "hi": 0.4,
-          "mean_pred": 0.29,
-          "freq": 0.31,
+          "mean_pred": 0.31,
+          "freq": 0.3,
           "n": 10
         },
         {
           "lo": 0.4,
           "hi": 0.6,
-          "mean_pred": 0.51,
-          "freq": 0.49,
-          "n": 9
+          "mean_pred": 0.49,
+          "freq": 0.45,
+          "n": 11
         },
         {
           "lo": 0.6,
           "hi": 0.8,
-          "mean_pred": 0.72,
-          "freq": 0.74,
+          "mean_pred": 0.68,
+          "freq": 0.6,
           "n": 5
         },
         {
           "lo": 0.8,
           "hi": 1.0,
-          "mean_pred": 0.91,
-          "freq": 0.93,
+          "mean_pred": 0.86,
+          "freq": 0.67,
           "n": 3
         }
       ]
     },
     {
       "kind": "live",
-      "n_resolved": 12,
+      "n_resolved": 6,
       "brier": {
-        "ensemble": 0.034,
-        "base_rate": 0.25,
-        "single_large": 0.082,
-        "single_mid": 0.095,
-        "equal_weight_swarm": 0.048
+        "ensemble": 0.2582,
+        "base_rate": 0.2194,
+        "single_large": 0.2719,
+        "single_mid": 0.2975,
+        "equal_weight_swarm": 0.3049
       },
       "brier_ci": {
         "ensemble": [
-          0.023,
-          0.049
+          0.205,
+          0.3115
         ],
         "base_rate": [
-          0.205,
-          0.295
+          0.1837,
+          0.2908
         ],
         "single_large": [
-          0.062,
-          0.104
+          0.1113,
+          0.4619
         ],
         "single_mid": [
-          0.071,
-          0.121
+          0.1625,
+          0.4725
         ],
         "equal_weight_swarm": [
-          0.032,
-          0.066
+          0.1955,
+          0.3896
         ]
       },
-      "ece": 0.041,
+      "ece": 0.048,
       "reliability": [
         {
           "lo": 0.0,
           "hi": 0.33,
-          "mean_pred": 0.15,
-          "freq": 0.17,
-          "n": 4
+          "mean_pred": 0.22,
+          "freq": 0.0,
+          "n": 2
         },
         {
           "lo": 0.33,
           "hi": 0.66,
-          "mean_pred": 0.48,
-          "freq": 0.5,
-          "n": 5
+          "mean_pred": 0.51,
+          "freq": 0.67,
+          "n": 3
         },
         {
           "lo": 0.66,
           "hi": 1.0,
-          "mean_pred": 0.85,
-          "freq": 0.82,
-          "n": 3
+          "mean_pred": 0.78,
+          "freq": 1.0,
+          "n": 1
         }
       ]
     }

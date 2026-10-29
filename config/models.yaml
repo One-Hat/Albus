@@ -6,7 +6,7 @@ models:
     id: "nvidia/nemotron-3-nano-30b-a3b"  # VERIFY against Nebius Token Factory /models endpoint once API key is active
     role: "bulk extraction and swarm personas"
     context_window: 32768
-    max_output_tokens: 4096
+    max_output_tokens: 8192
     temperature: 0.1
     cost_per_1m_input_tokens_usd: 0.20
     cost_per_1m_output_tokens_usd: 0.40

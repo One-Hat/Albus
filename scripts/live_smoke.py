@@ -1,6 +1,6 @@
 """
-OBSERVE-ONLY LIVE SMOKE TEST -- DO NOT RUN WITHOUT LIVE NEBIUS API KEY.
-Probes Nebius Token Factory endpoints for Nemotron Nano, Super, and Ultra.
+OBSERVE-ONLY LIVE SMOKE TEST -- DO NOT RUN WITHOUT LIVE API KEY.
+Probes the configured LLM provider endpoints (Groq / Nebius / OpenRouter) for Nano, Super, and Ultra roles.
 Verifies response shape, reasoning fields, latency, tokens, and cost accounting.
 This script performs NO mutations, NO database writes, and NO trading.
 """
@@ -10,7 +10,7 @@ import os
 import sys
 import time
 from pathlib import Path
-from typing import Dict, List
+from typing import Any, Dict, List
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
@@ -19,7 +19,8 @@ if hasattr(sys.stdout, "reconfigure"):
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from src.llm.client import LLMClient, ModelConfigManager
+from src.llm.client import LLMClient, load_dotenv_if_present
+load_dotenv_if_present()
 
 
 PROBES: Dict[str, str] = {
@@ -37,15 +38,14 @@ async def run_live_smoke() -> None:
         print("Cannot run live smoke test without a live API key in environment or .env file.")
         sys.exit(1)
 
-    provider = "Nebius" if os.environ.get("NEBIUS_API_KEY") else ("Groq" if os.environ.get("GROQ_API_KEY") else "OpenRouter")
-    print("=" * 70)
-    print(f"ALBUS -- LIVE {provider.upper()} REASONING SMOKE TEST (OBSERVE-ONLY)")
-    print("=" * 70)
-
-    mgr = ModelConfigManager("config/models.yaml")
     client = LLMClient(config_path="config/models.yaml")
+    mgr = client.config_manager
+    provider = mgr.active_provider.upper()
+    print("=" * 70)
+    print(f"ALBUS -- LIVE {provider} REASONING SMOKE TEST (OBSERVE-ONLY)")
+    print("=" * 70)
 
-    print(f"Base URL: {client.config_manager.endpoints.get('base_url')}")
+    print(f"Base URL: {mgr.endpoints.get('base_url')}")
     print(f"Concurrency Limit: {client.concurrency_limit}")
     print("-" * 70)
 

@@ -20,18 +20,3 @@
 ### 3. Serverless Jobs Documentation on CPU-Only Workloads
 - **Feedback**: The Nebius Serverless Jobs CLI documentation extensively details GPU platforms (e.g., `--platform gpu-l40s-a`, `--preset 1gpu-8vcpu-32gb`), but CPU-only platforms for lightweight orchestration, backtest evaluation, and parser workers are undocumented (`UNKNOWN`).
 - **Recommendation**: Document CPU-only presets and platforms directly in the Serverless Jobs quickstart guide for cost-effective batch data pipelines that do not require GPU hardware.
-
----
-
-### 2. Reasoning-Model Response Shape Standardization
-- **Feedback**: Nemotron reasoning models exhibit variable output shapes depending on inference engine settings:
-  1. Standard `message.content`
-  2. Distinct `message.reasoning_content` (with empty `content`)
-  3. Inline `<thought>` tags within `content`
-- **Recommendation**: Standardize OpenAI-compatible API responses with explicit documentation and guarantees that structured JSON outputs (e.g., via `response_format={"type": "json_object"}`) will place the final JSON in `message.content` while streaming internal chain-of-thought in `reasoning_content`.
-
----
-
-### 3. Serverless Jobs Documentation on CPU-Only Workloads
-- **Feedback**: The Nebius Serverless Jobs CLI documentation extensively details GPU platforms (e.g., `--platform gpu-l40s-a`, `--preset 1gpu-8vcpu-32gb`), but CPU-only platforms for lightweight orchestration, backtest evaluation, and parser workers are undocumented (`UNKNOWN`).
-- **Recommendation**: Document CPU-only presets and platforms directly in the Serverless Jobs quickstart guide for cost-effective batch data pipelines that do not require GPU hardware.
