@@ -161,8 +161,8 @@
     }
   ],
   "ledger": {
-    "length": 12,
-    "head_hash": "a4f8d9b2e1c3a7f654098bca123df4567890abcdef1234567890abcdef123456",
+    "length": 2,
+    "head_hash": "ff9cfd19c6a9680056685d0813d1a636d9eccdb027e6bde16b0cf2a570385d95",
     "verified": true
   },
   "stats": {
