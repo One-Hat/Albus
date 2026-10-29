@@ -136,8 +136,43 @@ Doc URL: https://docs.nebius.com/serverless/jobs/
 
 ---
 
-## 4. Operational & Security Checklist
+## 4. Deploying the Web Frontend on Vercel (Hybrid Architecture Option A)
+
+Per the approved Phase B4 decision ([docs/VERCEL_FEASIBILITY.md](docs/VERCEL_FEASIBILITY.md)), the web frontend (`web/`) is hosted on Vercel Edge CDN, serving static replays with zero cold start while pointing live swarm requests to the backend runner.
+
+### Instructions for the Vercel Project Owner:
+*(Reminder: Never commit Vercel tokens or keys. The Vercel account owner runs these commands locally).*
+
+1. **Install and Log In to Vercel CLI**:
+   ```bash
+   npm install -g vercel
+   vercel login
+   ```
+
+2. **Link or Create the Vercel Project**:
+   ```bash
+   cd web
+   vercel link
+   ```
+
+3. **Configure Environment Variables in Vercel Dashboard**:
+   - `NEXT_PUBLIC_API_BASE_URL`: Public HTTPS URL of the backend host (or leave blank to operate purely in static Replay Mode).
+   - *(Note: `GROQ_API_KEY` is NOT needed by the frontend and must NOT be added to Vercel)*.
+
+4. **Deploy to Preview / Production**:
+   ```bash
+   # Preview deployment
+   vercel
+
+   # Production deployment
+   vercel --prod
+   ```
+
+---
+
+## 5. Operational & Security Checklist
 
 1. **No Hardcoded Secrets**: Ensure `NEBIUS_API_KEY` and `GROQ_API_KEY` are never baked into Docker images or committed to git.
 2. **SEC Fair Access**: `SEC_USER_AGENT` must follow the SEC declaration standard: `SampleCompany AdminContact@domain.com`.
 3. **Banner Verification**: When running without live credentials, confirm the UI displays the `CACHED DEMO / MOCK MODE` banner at the top of the interface.
+4. **Vercel Account Isolation**: Only the designated Vercel project owner executes `vercel login` and `vercel deploy`.

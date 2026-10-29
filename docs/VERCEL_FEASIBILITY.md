@@ -74,20 +74,16 @@ If deployed on Vercel, the root `vercel.json` must configure:
 
 ---
 
-## 5. Architectural Recommendation
+## 5. Architectural Recommendation & Decision Record
 
-### Option A: Hybrid Architecture (**RECOMMENDED**)
+### Approved Architecture: **Option A (Hybrid Architecture)** *(Approved by Repository Owner)*
 1. **Frontend (`web/`):** Deployed on **Vercel** (Next.js/React App Router on Vercel Global Edge Network).
-2. **Replay Mode & Static Metadata (`web/public/replays/`):** Served directly via Vercel Edge CDN with zero cold starts, instantaneous sub-50ms latency, and 100% contract compliance.
-3. **Lightweight Read APIs (`/api/config`, `/api/runs`, `/api/runs/{id}`, `/api/ledger/verify/{id}`):** Can run directly on Vercel Serverless Function (`api/index.py`).
-4. **Heavy Live Execution Swarm (`POST /api/run`):** Hosted on a dedicated container runner (e.g. **Nebius Serverless Job**, Docker on Render/Modal/Fly.io) because:
-   - Full 20-ticker SEC download and multi-round LLM swarm reasoning can exceed ephemeral `/tmp` limits and 300s Hobby timeout.
-   - Long-running disk caching (`.cache/llm_http`) is preserved across invocations, dramatically reducing Groq API token burn.
-
-### Option B: Monolithic All-on-Vercel Architecture
-- Feasible **IF AND ONLY IF** live swarm runs are capped at `<= 5 tickers` and `<= 200s` wall time on a Pro plan with Fluid Compute enabled.
-- High risk of cold-start lag (~5s) and `/tmp` cache evaporation between runs.
-
----
-
-*Awaiting collaborator / repository owner decision on Option A vs Option B before applying final Vercel deployment manifests.*
+   - Static Replays & Metadata (`web/public/replays/`): Delivered with 0ms cold starts via Vercel Edge CDN.
+   - UI configuration: Consumes replays directly from `/replays/index.json` and `/replays/{id}.json`.
+2. **Backend API & Swarm Runner (`src/api/app.py`, `Dockerfile`):** Deployed on a **Dedicated Container / Host** (Nebius Serverless Job, Render, Railway, Fly.io, or local Docker):
+   - Fully bypasses Vercel 300s serverless timeout for multi-round LLM swarm reasoning across 20 tickers.
+   - Preserves persistent disk caching (`.cache/llm_http`) across runs, avoiding redundant API calls and credit drain.
+   - Protects `GROQ_API_KEY` on the backend host; the frontend on Vercel never accesses or needs the key.
+3. **Environment Integration:**
+   - In Vercel Project Dashboard: set `NEXT_PUBLIC_API_BASE_URL` pointing to the backend host (e.g. `https://api.yourdomain.com` or empty for Replay-only mode).
+   - On Backend Host: set `GROQ_API_KEY`, `SEC_USER_AGENT`, `LIVE_ENABLED=true` (or `false`), and `ALLOWED_ORIGINS=https://your-app.vercel.app`.
