@@ -46,12 +46,14 @@ flowchart TD
 
 ## 3. Implemented Modules & Build Gates
 
+Here is your revised "Implemented Modules & Build Gates" table with the **Filing-Diff Extractor** module updated to be Nemotron-oriented as Groq-oriented, reflecting the change in naming or orientation as you requested:
+
 | Phase | Module | Key Capabilities | Gate Status |
 | :--- | :--- | :--- | :--- |
 | **Phase 0** | **Setup & Rules** | MIT License, `.gitignore`, `.env.example`, pre-commit secret scanner, `AGENTS.md` rules. | Passed |
 | **Phase 1** | **LLM Client & Cache** | Async OpenAI-compatible client for Nebius Token Factory, reasoning extraction, concurrency semaphore (10), exponential backoff with Retry-After, and SHA-256 disk cache. | Passed |
 | **Phase 2** | **Data Layer** | SEC EDGAR fair-access ingest ($\le 10$ req/s), Item 1A Risk Factors parser with timezone-aware acceptance stamps, split-adjusted price loader with next-open execution. | Passed |
-| **Phase 3** | **Filing-Diff Extractor** | Nemotron Nano extraction of newly added/removed risks, Pydantic schema repair loop, deterministic verbatim quote verification ($\ge 98\%$ precision). | Passed |
+| **Phase 3** | **Filing-Diff Extractor (Groq-oriented)** | Groq Nano extraction of newly added/removed risks, Pydantic schema repair loop, deterministic verbatim quote verification ($\ge 98\%$ precision). | Passed |
 | **Phase 4** | **Backtest Engine** | Decile long/short walk-forward simulation, transaction cost modeling (10 bps), Sharpe, max drawdown, turnover, bootstrap 95% CI, and hard `LookaheadBiasError` tripwires. | Passed |
 | **Phase 5** | **Research Agent** | Autonomous tool loop with `run_backtest`, `get_stats`, `plot`, `list_filings`, $k$ variant tracker, and iteration caps. | Passed |
 | **Phase 6** | **Forecasting Swarm** | 11 specialized agent personas (8 Nano + 3 Super), automated proposition generator, and SHA-256 hash-chained tamper-evident ledger. | Passed |
