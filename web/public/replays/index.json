@@ -1,0 +1,9 @@
+[
+  {
+    "id": "mock-sample",
+    "created_at": "2026-10-29T12:00:00Z",
+    "source": "MOCK",
+    "hypothesis": "MOCK SAMPLE: Companies expanding cybersecurity and supply chain risk disclosures in Item 1A experience post-filing negative excess returns over a 60-day horizon.",
+    "verdict": "weak"
+  }
+]

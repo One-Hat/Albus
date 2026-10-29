@@ -1,0 +1,16 @@
+# CODEOWNERS - Enforcing Directory Ownership between Backend and Frontend
+# Rules: Nobody edits the other team's files.
+# The contract changes only by PR touching contracts/, approved by both.
+
+# Backend Ownership
+/src/                    @backend-owner
+/scripts/                @backend-owner
+/api/                    @backend-owner
+/tests/                  @backend-owner
+/web/public/replays/     @backend-owner
+
+# Shared Interface Boundary (Requires mutual review & approval)
+/contracts/              @backend-owner @frontend-owner
+
+# Frontend Ownership
+/web/                    @frontend-owner
