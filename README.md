@@ -4,6 +4,7 @@
 [![Python: 3.11-3.14](https://img.shields.io/badge/Python-3.11%20--%203.14-blue.svg)](https://www.python.org/)
 [![Nebius: Token Factory](https://img.shields.io/badge/Nebius-Token%20Factory-green.svg)](https://nebius.com)
 [![NVIDIA: Nemotron](https://img.shields.io/badge/NVIDIA-Nemotron-76B900.svg)](https://build.nvidia.com)
+[![Groq: Open-Source Models](https://img.shields.io/badge/Groq-Open--Source%20Models-F55036.svg)](https://groq.com)
 [![CI](https://github.com/One-Hat/Albus/actions/workflows/ci.yml/badge.svg)](https://github.com/One-Hat/Albus/actions)
 
 **Track:** Best Apps and Agents | **Nebius x NVIDIA Global AI Hackathon**
@@ -16,12 +17,13 @@
 
 Financial chatbots frequently hallucinate plausible-sounding investment rationales without empirical backing. ALBUS bridges qualitative corporate disclosures and quantitative factor investing:
 1. **Verbatim Ground Truth:** Ingests raw SEC EDGAR 10-K filings and enforces that every extracted claim maps to an exact verbatim substring in the source text.
-2. **Specialized Tri-Model Architecture:** Distributes tasks across NVIDIA Nemotron-3 models on Nebius Token Factory:
-   - **Nano 30B (`nvidia/nemotron-3-nano-30b-a3b`):** High-throughput bulk extraction and 8 diverse persona forecasters.
-   - **Super 120B (`nvidia/nemotron-3-super-120b-a12b`):** Autonomous quantitative research agent, hypothesis generator, and swarm reasoner.
-   - **Ultra 550B (`nvidia/Nemotron-3-Ultra-550b-a55b`):** Skeptical adversarial critic auditing for lookahead bias, overfitting, and citation integrity.
+2. **Specialized Tri-Tier Model Architecture (Multi-Provider Support):** Distributes specialized cognitive workloads across model tiers, supporting both **NVIDIA Nemotron-3** on **Nebius Token Factory** and instant open-source inference on **Groq Cloud**:
+   - **Nano Tier:** High-throughput bulk extraction and 8 diverse persona forecasters (`nvidia/nemotron-3-nano-30b-a3b` on Nebius, or `openai/gpt-oss-20b` on Groq).
+   - **Super Tier:** Autonomous quantitative research agent, hypothesis generator, and swarm reasoner (`nvidia/nemotron-3-super-120b-a12b` on Nebius, or `openai/gpt-oss-120b` on Groq).
+   - **Ultra Tier:** Skeptical adversarial critic auditing for lookahead bias, overfitting, and citation integrity (`nvidia/Nemotron-3-Ultra-550b-a55b` on Nebius, or `openai/gpt-oss-120b` on Groq).
 3. **Strict No-Lookahead Execution:** Every trade strictly executes at the next market open ($09:30\text{ ET}$) following the SEC acceptance timestamp (`accepted_at`), validated continuously by `test_no_lookahead`.
 4. **Self-Calibrating Swarm:** 11 specialized personas output calibrated probabilistic forecasts updated via Pool-Adjacent-Violators (PAVA) isotonic regression and logged in a tamper-evident hash-chained ledger.
+5. **Zero-Friction Live Execution:** In response to cloud deposit/credit-card gating during rapid prototyping, ALBUS natively decouples inference from cloud hosting. Developers can run live with a free Groq API key in seconds, while the codebase remains 100% prepared for production deployment onto Nebius Serverless Endpoints and Jobs.
 
 ---
 
@@ -113,8 +115,14 @@ cp .env.example .env
 ```
 Populate environment variables (secrets must never be committed to code or git per Rule 7):
 ```env
+# Option A: Groq Cloud (Free instant open-source inference, no credit card required)
+GROQ_API_KEY=your_groq_api_key_here
+
+# Option B: Nebius Token Factory (NVIDIA Nemotron-3 models)
 NEBIUS_BASE_URL=https://api.tokenfactory.nebius.com/v1
 NEBIUS_API_KEY=your_live_nebius_api_key_here
+
+# Required SEC EDGAR Ingestion User Agent
 SEC_USER_AGENT=ALBUS-QuantResearchCopilot/1.0 (researcher@example.com)
 ```
 

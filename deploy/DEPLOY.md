@@ -69,7 +69,7 @@ Doc URL: https://docs.nebius.com/serverless/endpoints/
    - Under **Configuration**, choose **Custom**.
    - Input **Image path**: `<REGISTRY_HOST>/<PROJECT_ID>/albus:v0.1.0`.
    - Set **Ports**: `8080` (HTTP health check) and `8501` (HTTP UI).
-   - Under **Environment variables**, set `SEC_USER_AGENT` and secret `NEBIUS_API_KEY`.
+   - Under **Environment variables**, set `SEC_USER_AGENT` and secret `NEBIUS_API_KEY` (or `GROQ_API_KEY` for open-source inference).
    - Click **Create**. Once status shows `Running`, copy the public HTTPS URL.
 
 4. **Verify Endpoint Health**  
@@ -138,6 +138,6 @@ Doc URL: https://docs.nebius.com/serverless/jobs/
 
 ## 4. Operational & Security Checklist
 
-1. **No Hardcoded Secrets**: Ensure `NEBIUS_API_KEY` is never baked into Docker images or committed to git.
+1. **No Hardcoded Secrets**: Ensure `NEBIUS_API_KEY` and `GROQ_API_KEY` are never baked into Docker images or committed to git.
 2. **SEC Fair Access**: `SEC_USER_AGENT` must follow the SEC declaration standard: `SampleCompany AdminContact@domain.com`.
 3. **Banner Verification**: When running without live credentials, confirm the UI displays the `CACHED DEMO / MOCK MODE` banner at the top of the interface.
